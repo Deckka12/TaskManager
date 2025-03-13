@@ -24,7 +24,7 @@ namespace TaskManager.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasks()
         {
-            var tasks = await _taskService.GetAllTasksAsync();
+            var tasks = await _taskService.GetAllTasks();
             return Ok(tasks);
         }
 

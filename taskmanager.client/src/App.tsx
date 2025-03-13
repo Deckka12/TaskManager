@@ -1,12 +1,21 @@
 import React from 'react';
-import './App.css';
-import TaskList from './Task/TaskList';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './Header';
+import Tasks from './Task/TaskList';
+import Projects from './Project/Projects';
 
 const App: React.FC = () => {
     return (
-        <div className="app-container">
-            <TaskList />
-        </div>
+        <Router>
+            <Header />
+            <div className="content">
+                <Routes>
+                    <Route path="/tasks" element={<Tasks />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="*" element={<h2>Страница не найдена</h2>} />
+                </Routes>
+            </div>
+        </Router>
     );
 }
 

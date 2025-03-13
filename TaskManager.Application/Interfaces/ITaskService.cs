@@ -16,5 +16,7 @@ namespace TaskManager.Application.Interfaces
         Task UpdateTaskAsync(TaskDTO taskDto);
         Task DeleteTaskAsync(Guid id);
         Task<IEnumerable<TaskDTO>> GetTasksByUser(Guid userId);
+
+        Task<IEnumerable<TaskDtos>> GetAllTasks();
     }
 }

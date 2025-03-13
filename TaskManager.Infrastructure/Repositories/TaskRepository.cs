@@ -40,5 +40,11 @@ namespace TaskManager.Infrastructure.Repositories
                 .ThenInclude(u => u.User)// ✅ Загружаем WorkLogs
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
+        public async Task<IEnumerable<TaskItem>> GetByAllTask()
+        {
+            return await _context.Tasks
+               .Include(t => t.Project).Include(x => x.User).ToListAsync();
+               
+        }
     }
 }

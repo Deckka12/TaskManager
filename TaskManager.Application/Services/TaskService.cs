@@ -117,5 +117,20 @@ namespace TaskManager.Application.Services
                 Priority = t.Priority // Добавляем дату создания, если необходимо
             }).ToList();
         }
+
+        public async Task<IEnumerable<TaskDtos>> GetAllTasks()
+        {
+            var tasks = await _taskRepository.GetByAllTask();  // Используем метод репозитория для получения задач
+            return tasks.Select(t => new TaskDtos
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Description = t.Description,
+                Status = t.Status,
+                Priority = t.Priority,
+                ProjectName = t.Project.Name,
+                UserName = t.User.Name
+            }).ToList();
+        }
     }
 }
