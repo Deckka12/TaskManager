@@ -12,14 +12,14 @@ interface TaskItem {
     priority: number;
     userName: string;
 }
-
+const API_BASE_URL = "http://192.168.22.250:5213";
 const TaskList: React.FC = () => {
     const [tasks, setTasks] = useState<TaskItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
 
     useEffect(() => {
-        axios.get<TaskItem[]>('http://localhost:5213/api/task')
+        axios.get<TaskItem[]>(`${API_BASE_URL}/api/task`)
             .then(response => {
                 setTasks(response.data);
                 setLoading(false);

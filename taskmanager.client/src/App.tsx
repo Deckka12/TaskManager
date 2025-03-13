@@ -5,6 +5,7 @@ import AuthProvider from "./context/AuthContext";
 import Tasks from './Task/TaskList';
 import Projects from './Project/Projects';
 import Login from "./Login/Login";
+import CreateTask from "./Task/CreateTask";
 import Register from "./Login/Register";
 
 
@@ -19,6 +20,7 @@ const App: React.FC = () => {
                         <Route path="/register" element={<Register />} />
                         <Route path="/tasks" element={<Tasks />} />
                         <Route path="/projects" element={<Projects />} />
+                        <Route path="/create" element={<CreateTask />} />
                         <Route path="*" element={<h2>Страница не найдена</h2>} />
                     </Routes>
                 </div>

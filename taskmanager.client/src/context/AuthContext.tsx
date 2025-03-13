@@ -3,14 +3,15 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 interface User {
+    id: string;
     name: string;
+    email: string;
     exp: number;
-    // Äîáàâü äðóãèå ïîëÿ, åñëè îíè åñòü â òîêåíå
 }
 
 interface AuthContextType {
     token: string | null;
-    login: (username: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     user: User | null;
 }
@@ -23,31 +24,40 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     useEffect(() => {
         if (token) {
-            const decoded: User = jwtDecode(token);
-            setUser(decoded);
+            try {
+                const decoded: any = jwtDecode(token);
+                console.log("Ð”ÐµÐºÐ¾Ð´Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ð¹ JWT:", decoded); // Ð”Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð»Ð¾Ð³Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ
+
+                if (decoded && decoded.sub && decoded.name && decoded.email) {
+                    setUser({
+                        id: decoded.sub,
+                        name: decoded.name,
+                        email: decoded.email,
+                        exp: decoded.exp
+                    });
+                } else {
+                    console.error("ÐžÑˆÐ¸Ð±ÐºÐ° Ð´ÐµÐºÐ¾Ð´Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ JWT: Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ñ…", decoded);
+                    setToken(null);
+                    setUser(null);
+                }
+            } catch (error) {
+                console.error("ÐžÑˆÐ¸Ð±ÐºÐ° Ð´ÐµÐºÐ¾Ð´Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ JWT:", error);
+                setToken(null);
+                setUser(null);
+            }
         }
     }, [token]);
 
+
     const login = async (email: string, password: string) => {
         try {
-            console.log("Îòïðàâëÿåì äàííûå:", { email, password }); // Ëîã äëÿ ïðîâåðêè
-            const response = await axios.post("http://localhost:5213/api/auth/login", {
-                email: email.trim(), // Óáèðàåì ïðîáåëû
-                password
-            });
-
-            console.log("Îòâåò ñåðâåðà:", response.data);
+            const response = await axios.post("http://localhost:5213/api/auth/login", { email, password });
             localStorage.setItem("token", response.data.token);
             setToken(response.data.token);
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.error("Îøèáêà âõîäà:", error.response?.data || error.message);
-            } else {
-                console.error("Íåèçâåñòíàÿ îøèáêà:", error);
-            }
+            console.error("ÑœÑˆÐ¸Ð±ÐºÐ° Ð²Ñ…Ð¾Ð´Ð°:", error);
         }
     };
-
 
     const logout = () => {
         localStorage.removeItem("token");

@@ -31,7 +31,7 @@
 /* Сетка для списка задач (3 в ряд) */
 .task-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 3 колонки */
+    grid-template-columns: repeat(3, minmax(250px, 1fr)); /* 3 колонки */
     gap: 15px; /* Отступы между карточками */
     justify-content: center;
 }
