@@ -13,14 +13,11 @@ namespace TaskManager.Server.Controllers
         {
             _taskService = taskService;
         }
-        // Статический список задач для примера
-        //private static List<TaskItem> tasks = new List<TaskItem>
-        //{
-        //    new TaskItem { Id = Guid.NewGuid(), Title = "Task 1", Description = "Description 1", IsCompleted = false },
-        //    new TaskItem { Id = Guid.NewGuid(), Title = "Task 2", Description = "Description 2", IsCompleted = true }
-        //};
 
-        // Получить все задачи
+        /// <summary>
+        /// Получаеам все задачи
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasks()
         {
@@ -28,7 +25,11 @@ namespace TaskManager.Server.Controllers
             return Ok(tasks);
         }
 
-        // Получить задачу по Id
+        /// <summary>
+        /// Получаем задачи по ИД
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public ActionResult<TaskItem> GetTaskById(Guid id)
         {
