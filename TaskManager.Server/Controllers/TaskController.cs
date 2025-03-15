@@ -14,12 +14,13 @@ namespace TaskManager.Server.Controllers
     [Route("api/[controller]")]
     public class TaskController : ControllerBase
     {
+        private readonly IUserService _userService;
         private readonly ITaskService _taskService;
         private readonly IProjectService _projectService;
-        public TaskController(ITaskService taskService, IProjectService projectService) 
+        public TaskController(ITaskService taskService, IProjectService projectService, IUserService userService) 
         {
             _projectService = projectService;
-
+            _userService = userService;
             _taskService = taskService;
         }
 
@@ -48,6 +49,40 @@ namespace TaskManager.Server.Controllers
 
             return Ok();
         }
+
+        [HttpPost("delete")]
+        public async Task<IActionResult> DeleteTask([FromBody] DeleteTaskRequest request)
+        {
+            if (!Guid.TryParse(request.Id, out Guid taskID))
+            {
+                return BadRequest(new { message = "Некорректный ID задачи" });
+            }
+
+            var task = await _taskService.GetTaskByIdAsync(taskID);
+            if (task == null)
+            {
+                return NotFound(new { message = "Задача не найдена" });
+            }
+            try
+            {
+                await _taskService.DeleteTaskAsync(taskID);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.ToString() });
+            }
+            
+            return Ok(new { message = "Задача удалена" });
+        }
+
+        // DTO для запроса удаления
+        public class DeleteTaskRequest
+        {
+            public string Id { get; set; }
+        }
+
+
+
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] TaskDTO taskDto)
@@ -101,14 +136,15 @@ namespace TaskManager.Server.Controllers
             var projectModel = projects.Select(p => new ProjectModel
             {
                 ID = p.Id.ToString(),
-                Description = p.Name
+                Description = p.Description,
+                Name = p.Name
             }).ToList();
             return Ok(projectModel);
         }
         [HttpGet("priorities")]
         public async Task<IActionResult> GetPriorities()
         {
-            var priorities = Enum.GetValues(typeof(TaskManager.Domain.Enums.TaskPriority))
+            var priorities = Enum.GetValues(typeof(TaskManager.Domain.Enums.TaskPriority ))
                                  .Cast<TaskManager.Domain.Enums.TaskPriority>()
                                  .Select(p => new PriorityModel
                                  {
@@ -119,11 +155,23 @@ namespace TaskManager.Server.Controllers
 
             return Ok(priorities);
         }
+
+        /// <summary>
+        /// Получаеам все задачи
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var tasks = await _userService.GetAllUsersAsync();
+            return Ok(tasks);
+        }
     }
     public class ProjectModel
     {
         public string ID { get; set; }
         public string Description { get; set; }
+        public string Name { get; set; }
     }
 
     public class PriorityModel

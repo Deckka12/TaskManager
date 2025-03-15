@@ -68,5 +68,8 @@
 }
 
     .logout-button:hover {
-        background-color: #c0392b;
+        background: #1d49aa;
+        box-shadow: 0 0 0 4px #cbd6ee;
+        border: 160px;
+        border-color: aliceblue;
     }

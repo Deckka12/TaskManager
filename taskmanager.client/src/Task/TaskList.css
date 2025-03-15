@@ -1,117 +1,151 @@
 /* Общий контейнер */
 .task-container {
-    max-width: 95%; /* Ширина контейнера */
-    margin: 30px auto;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: #f4f4f9;
+    border-radius: 12px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
 /* Заголовок */
 .title {
-    font-size: 28px;
-    color: #333;
+    font-size: 30px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Фильтры */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
     margin-bottom: 20px;
 }
 
-/* Текст "Загрузка..." */
-.loading-text {
-    font-size: 18px;
-    color: #555;
+    .filters input,
+    .filters select {
+        padding: 10px;
+        border: 2px solid #ced4da;
+        border-radius: 6px;
+        width: 220px;
+        font-size: 14px;
+        transition: border 0.3s ease-in-out;
+    }
+
+        .filters input:focus,
+        .filters select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+/* Кнопка "Создать" */
+.buttonstyle {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
-/* Сообщение о пустом списке */
-.no-tasks {
-    font-size: 18px;
-    color: #777;
-}
+    .buttonstyle:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 8px rgba(0, 91, 187, 0.3);
+    }
 
-/* Сетка для списка задач (3 в ряд) */
+/* Сетка для списка задач */
 .task-list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(250px, 1fr)); /* 3 колонки */
-    gap: 15px; /* Отступы между карточками */
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 20px;
     justify-content: center;
 }
 
 /* Карточка задачи */
 .task-card {
-    background: #fff;
-    padding: 15px;
+    background: white;
+    padding: 18px;
     border-radius: 8px;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
     text-align: left;
     transition: transform 0.2s ease-in-out;
+    /*cursor: pointer;*/
     word-break: break-word;
 }
 
     .task-card:hover {
-        transform: scale(1.02);
+       /* transform: translateY(-5px);
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);*/
     }
 
-    /* Выполненная задача */
-    .task-card.completed {
-        background-color: #d4edda;
+    .task-card h3 {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 5px;
     }
 
 /* Статус */
 .status {
     font-size: 16px;
+    font-weight: bold;
     margin-top: 10px;
 }
 
 /* Цвета для статусов */
 .status-completed {
     color: #28a745;
-    font-weight: bold;
 }
 
 .status-pending {
     color: #dc3545;
-    font-weight: bold;
 }
 
-/* Модальное окно - фон */
+/* Модальное окно */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
-/* Контент модального окна */
 .modal-content {
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
     text-align: center;
-    max-width: 400px;
-    word-break: break-word;
+    width: 400px;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Кнопка закрытия */
 .close-button {
-    background: #007bff;
+    background: #ff4b5c;
     color: white;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
-    margin-top: 10px;
-    border-radius: 5px;
+    margin-top: 15px;
+    border-radius: 6px;
+    font-size: 14px;
     transition: background 0.3s;
 }
 
     .close-button:hover {
-        background: #0056b3;
+        background: #d43f51;
     }
 
 /* Анимация появления */
@@ -127,6 +161,83 @@
     }
 }
 
-.modal-content {
-    animation: fadeIn 0.3s ease-in-out;
+/* Пагинация */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
 }
+
+    .pagination button {
+        padding: 10px 15px;
+        border: none;
+        background: #2c3e50;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #0056b3;
+        }
+
+/* Поля ввода */
+.inputstyle {
+    border: 2px solid #ced4da;
+    border-radius: 5px;
+    padding: 8px;
+    width: 100%;
+    font-size: 14px;
+    transition: border 0.3s ease-in-out;
+}
+
+    .inputstyle:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+/* Контейнер для формы создания задачи */
+.createTask {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.divbuttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+.hidetext {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.buttonImg {
+    float: right;
+}
+
+.images {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+    .images:hover {
+      /*  transform: translateY(-2px);
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);*/
+        cursor: pointer;
+    }

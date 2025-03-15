@@ -1,0 +1,52 @@
+/* Общий контейнер */
+.project-container {
+    max-width: 95%; /* Ширина контейнера */
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Заголовок */
+.title {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Текст "Загрузка..." */
+.loading-text {
+    font-size: 18px;
+    color: #555;
+}
+
+/* Сообщение о пустом списке */
+.no-projects {
+    font-size: 18px;
+    color: #777;
+}
+
+/* Сетка для списка задач (3 в ряд) */
+.project-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(250px, 1fr)); /* 3 колонки */
+    gap: 15px; /* Отступы между карточками */
+    justify-content: center;
+}
+
+/* Карточка задачи */
+.project-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    transition: transform 0.2s ease-in-out;
+    word-break: break-word;
+}
+
+    .project-card:hover {
+        transform: scale(1.02);
+    }

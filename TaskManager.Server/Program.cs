@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Users/Logout"; // Страница выхода
     });
 
-builder.WebHost.UseUrls("http://192.168.22.250:5213");
+//builder.WebHost.UseUrls("http://192.168.22.250:5213");
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
 {
