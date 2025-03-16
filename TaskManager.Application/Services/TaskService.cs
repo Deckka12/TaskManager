@@ -129,7 +129,8 @@ namespace TaskManager.Application.Services
                 Status = t.Status,
                 Priority = t.Priority,
                 ProjectName = t.Project.Name,
-                UserName = t.User.Name
+                UserName = t.User.Name,
+                UserId = t.UserId
             }).ToList();
         }
     }

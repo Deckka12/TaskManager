@@ -24,6 +24,7 @@ namespace TaskManager.Application.DTOs
 
         public TaskPriority Priority { get; set; } = TaskPriority.Medium;
         public string UserName { get; set; }
+        public Guid UserId { get; set; }
 
         public List<WorkLog>? workLogs { get; set; }
 

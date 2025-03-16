@@ -12,6 +12,7 @@ interface TaskItem {
     status: number;
     priority: number;
     userName: string;
+    userId: string;
 }
 
 interface User {
@@ -95,6 +96,14 @@ const TaskList: React.FC = () => {
         setCurrentPage(1); // Сбрасываем страницу на первую
     }, [filterUser, filterPriority, filterProject, filterTitle, tasks]);
 
+    //получение задач
+    const gettasks = async () => {
+        axios.get<TaskItem[]>(`${API_BASE_URL}/api/task`)
+            .then(response => {
+                setFilteredTasks(response.data);
+                setLoading(false);
+            })
+    }
     // Создание задачи
     const handleCreateTask = async () => {
         if (!title.trim() || !description.trim() || !projectId) {
@@ -123,23 +132,17 @@ const TaskList: React.FC = () => {
         console.log("Отправляемые данные:", requestBody);
 
         try {
-            const response = await axios.post(
+            await axios.post(
                 "https://localhost:7121/api/task/create",
                 requestBody,
                 { headers: { Authorization: `Bearer ${auth?.token}` } }
             );
-
-            console.log("Ответ сервера:", response.data);
             closeTaskCreate();
-            axios.get<TaskItem[]>(`${API_BASE_URL}/api/task`)
-                .then(response => {
-                    setFilteredTasks(response.data);
-                    setLoading(false);
-                })
+            gettasks();
             alert("Задача успешно создана!");
         } catch (error) {
             console.error("Ошибка при создании задачи:", error);
-            alert("Не удалось создать задачу.");
+            alert("Не достаточно прав.");
         }
     };
 
@@ -153,18 +156,10 @@ const TaskList: React.FC = () => {
             const response = await axios.post(`${API_BASE_URL}/api/task/delete`, { id: taskId }, {
                 headers: { Authorization: `Bearer ${auth?.token}` }
             });
-
-
-
             console.log("Ответ сервера:", response.data);
             alert("Задача успешно удалена!");
             closeTaskDetails();
-            // Обновляем список задач
-            axios.get<TaskItem[]>(`${API_BASE_URL}/api/task`)
-                .then(response => {
-                    setFilteredTasks(response.data);
-                    setLoading(false);
-                })
+            gettasks();
         } catch (error) {
             console.error("Ошибка при удалении задачи:", error);
             alert("Не удалось удалить задачу.");
@@ -242,9 +237,11 @@ const TaskList: React.FC = () => {
                                     <p><strong>Статус:</strong> {getStatusText(task.status)}</p>
                                     <p><strong>Приоритет:</strong> {getPriorityText(task.priority)}</p>
                                     <div className="buttonImg">
-                                        <div className="images"><img onClick={() => openTaskDetails(task)}  src="./src/Icons/view.png" /></div>
-                                        <div className = "images"><img src="./src/Icons/Edit.png" /></div>
-                                        <div className="images"><img onClick={() => handleDeleteTask(task.id)} src="./src/Icons/Delete.png" /></div>
+                                        <div className="images"><img onClick={() => openTaskDetails(task)} src="./src/Icons/view.png" /></div>
+
+                                        {auth?.user?.id == task.userId && <div className="images"><img src="./src/Icons/Edit.png" /></div>}
+                                        {/*{auth?.user?.id != task.userID && <div className="images disalbled"><img src="./src/Icons/Edit.png" /></div>}*/}
+                                        {auth?.user?.id == task.userId && <div className="images"><img onClick={() => handleDeleteTask(task.id)} src="./src/Icons/Delete.png" /></div>}
                                     </div>
                                 </div>
 
@@ -269,7 +266,7 @@ const TaskList: React.FC = () => {
                 <div className="modal-overlay" onClick={closeTaskDetails}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h2>{selectedTask.title}</h2>
-                        <p><strong>Описание:</strong> {selectedTask.description}</p>
+                        <p ><strong>Описание:</strong> {selectedTask.description}</p>
                         <p><strong>Проект ID:</strong> {selectedTask.projectName}</p>
                         <p><strong>Статус:</strong> {getStatusText(selectedTask.status)}</p>
                         <p><strong>Приоритет:</strong> {getPriorityText(selectedTask.priority)}</p>
@@ -284,8 +281,10 @@ const TaskList: React.FC = () => {
                         {/*        </ul>*/}
                         {/*    </>*/}
                         {/*)}*/}
-                        <button onClick={closeTaskDetails} className="close-button buttonstyle">Закрыть</button>
-                        <button key={selectedTask.id} onClick={() => handleDeleteTask(selectedTask.id)} className="close-button buttonstyle">Удалить</button>
+                        <div className = "divbutton">
+                            <button onClick={closeTaskDetails} className="buttonstyle">Закрыть</button>
+                            <button key={selectedTask.id} onClick={() => handleDeleteTask(selectedTask.id)} className="buttonstyle">Удалить</button>
+                        </div>
                     </div>
                 </div>
             )}
