@@ -229,13 +229,21 @@
     float: right;
 }
 
+.imagesdisabled {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    padding-left: 5px;
+    padding-right: 5px;
+    pointer-events: none;
+}
+
 .images {
     width: 20px;
     height: 20px;
     display: inline-flex;
     padding-left: 5px;
     padding-right: 5px;
-
 }
 
     .images:hover {

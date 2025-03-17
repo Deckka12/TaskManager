@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Projects.css'; // Подключаем CSS
-import { AuthContext } from "../context/AuthContext";
 
 interface Project {
     id: string;
@@ -16,7 +15,6 @@ const API_BASE_URL = "http://localhost:5213";
 const Projects: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [projects, setProjects] = useState<Project[]>([]);
-    const auth = useContext(AuthContext);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
 

@@ -2,6 +2,9 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import './TaskList.css'; // Подключаем CSS
 import { AuthContext } from "../context/AuthContext";
+import viewIcon from '../Icons/view.png';
+import editIcon from '../Icons/Edit.png';
+import deleteIcon from '../Icons/Delete.png';
 
 // Интерфейсы
 interface TaskItem {
@@ -26,7 +29,8 @@ interface Project {
     description: string;
 }
 
-const API_BASE_URL = "http://localhost:5213";
+const API_BASE_URL = "http://192.168.22.53:5213";
+
 
 const TaskList: React.FC = () => {
     const [tasks, setTasks] = useState<TaskItem[]>([]);
@@ -51,6 +55,7 @@ const TaskList: React.FC = () => {
     const [projectId, setProjectId] = useState("");
     const [users, setUsers] = useState<User[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
+
 
     useEffect(() => {
         // Загружаем задачи
@@ -190,11 +195,12 @@ const TaskList: React.FC = () => {
     const indexOfFirstTask = indexOfLastTask - tasksPerPage;
     const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
     const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
+/*    let imageClassName = "images";*/
 
     return (
         <div className="task-container">
             <h1 className="title">Список задач</h1>
-
+            
             {/* Фильтры */}
             <div className="filters">
                 <input type="text" placeholder="Фильтр по названию"
@@ -229,7 +235,6 @@ const TaskList: React.FC = () => {
                 ) : (
                     <>
                         <div className="task-list">
-
                             {currentTasks.map(task => (
                                 <div key={task.id} className="task-card" /*onClick={() => openTaskDetails(task)}*/>
                                     <h3>{task.title}</h3>
@@ -237,11 +242,13 @@ const TaskList: React.FC = () => {
                                     <p><strong>Статус:</strong> {getStatusText(task.status)}</p>
                                     <p><strong>Приоритет:</strong> {getPriorityText(task.priority)}</p>
                                     <div className="buttonImg">
-                                        <div className="images"><img onClick={() => openTaskDetails(task)} src="./src/Icons/view.png" /></div>
-
-                                        {auth?.user?.id == task.userId && <div className="images"><img src="./src/Icons/Edit.png" /></div>}
+                                        <div className="images"><img onClick={() => openTaskDetails(task)} src={viewIcon} alt="Просмотр" /></div>
+                                        {/*{auth?.user?.id != task.userId ? imageClassName = "images" : imageClassName = "imagesDisabled"}*/}
+                                        <div className="images">
+                                            <img src={editIcon} alt="Редактировать" />
+                                        </div>
                                         {/*{auth?.user?.id != task.userID && <div className="images disalbled"><img src="./src/Icons/Edit.png" /></div>}*/}
-                                        {auth?.user?.id == task.userId && <div className="images"><img onClick={() => handleDeleteTask(task.id)} src="./src/Icons/Delete.png" /></div>}
+                                        {/*{auth?.user?.id == task.userId &&*/} <div className="images"><img onClick={() => handleDeleteTask(task.id)} src={deleteIcon} alt="Удалить" /></div>
                                     </div>
                                 </div>
 
