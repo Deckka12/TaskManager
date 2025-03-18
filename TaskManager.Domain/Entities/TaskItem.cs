@@ -16,9 +16,15 @@ namespace TaskManager.Domain.Entities
         public TaskStatus Status { get; set; } = TaskStatus.New;
         public TaskPriority Priority { get; set; } = TaskPriority.Medium;
         public DateTime? DueDate { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+        public DateTime ChangedDate { get; set; } = DateTime.UtcNow;
 
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
+        public Guid? PerformerID { get; set; }
+        public User? Performer { get; set; } = null!;
+        public Guid? CategotyID { get; set; }
+        public Category? Category { get; set; } = null!;
 
         public Guid ProjectId { get; set; }
         public Project Project { get; set; } = null!;

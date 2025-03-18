@@ -43,7 +43,8 @@ namespace TaskManager.Application.Services
             {
                 Id = user.Id,
                 Name = user.Name,
-                Email = user.Email
+                Email = user.Email,
+                TelegramId = user.TelegramId,
             };
         }
 

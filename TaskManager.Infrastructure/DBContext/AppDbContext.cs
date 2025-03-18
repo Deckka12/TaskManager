@@ -18,19 +18,23 @@ namespace TaskManager.Infrastructure.DBContext
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Category> Category { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // ❌ ОТКЛЮЧАЕМ ВСЕ CASCADE-УДАЛЕНИЯ
-
             // Task → User
             modelBuilder.Entity<TaskItem>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Tasks)
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<TaskItem>()
+           .HasOne(t => t.Performer)
+           .WithMany()
+           .HasForeignKey(t => t.PerformerID)
+           .OnDelete(DeleteBehavior.Restrict);
 
             // Task → Project
             modelBuilder.Entity<TaskItem>()

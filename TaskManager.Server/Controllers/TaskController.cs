@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using TaskManager.Application.DTOs;
@@ -103,6 +104,10 @@ namespace TaskManager.Server.Controllers
                 return Unauthorized();
             }
 
+            var user = await _userService.GetUserByIdAsync(taskDto.UserId);
+            if (user == null)
+                return BadRequest("Пользователь не найден");
+
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!Guid.TryParse(userIdClaim, out var userId) || userId == Guid.Empty)
             {
@@ -120,6 +125,12 @@ namespace TaskManager.Server.Controllers
             try
             {
                 await _taskService.CreateTaskAsync(taskDto);
+                // Отправляем уведомление в Telegram
+                if (!string.IsNullOrEmpty(user.TelegramId))
+                {
+                    var telegramService = HttpContext.RequestServices.GetRequiredService<TelegramService>();
+                    await telegramService.SendNotification(user.TelegramId, $"📌 Вам назначена новая задача: {taskDto.Title}");
+                }
                 return Ok(new { message = "Задача успешно создана!" });
             }
             catch (Exception ex)

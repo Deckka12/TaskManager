@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.DBContext;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.DBContext;
 namespace TaskManager.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250318160510_addmaininfo")]
+    partial class addmaininfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace TaskManager.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("TaskManager.Domain.Entities.Category", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Category");
-                });
 
             modelBuilder.Entity("TaskManager.Domain.Entities.Comment", b =>
                 {
@@ -129,26 +117,11 @@ namespace TaskManager.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CategotyID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ChangedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("PerformerID")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
@@ -167,10 +140,6 @@ namespace TaskManager.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("PerformerID");
 
                     b.HasIndex("ProjectId");
 
@@ -289,15 +258,6 @@ namespace TaskManager.Infrastructure.Migrations
 
             modelBuilder.Entity("TaskManager.Domain.Entities.TaskItem", b =>
                 {
-                    b.HasOne("TaskManager.Domain.Entities.Category", "Category")
-                        .WithMany("Tasks")
-                        .HasForeignKey("CategoryId");
-
-                    b.HasOne("TaskManager.Domain.Entities.User", "Performer")
-                        .WithMany()
-                        .HasForeignKey("PerformerID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("TaskManager.Domain.Entities.Project", "Project")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
@@ -309,10 +269,6 @@ namespace TaskManager.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Performer");
 
                     b.Navigation("Project");
 
@@ -335,11 +291,6 @@ namespace TaskManager.Infrastructure.Migrations
                     b.Navigation("Task");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TaskManager.Domain.Entities.Category", b =>
-                {
-                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("TaskManager.Domain.Entities.Project", b =>

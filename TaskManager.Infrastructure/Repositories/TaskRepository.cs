@@ -37,7 +37,7 @@ namespace TaskManager.Infrastructure.Repositories
         {
             return await _context.Tasks
                 .Include(t => t.WorkLogs) 
-                .ThenInclude(u => u.User)// ✅ Загружаем WorkLogs
+                .ThenInclude(u => u.User)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
         public async Task<IEnumerable<TaskItem>> GetByAllTask()

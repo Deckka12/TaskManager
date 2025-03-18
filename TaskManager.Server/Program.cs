@@ -31,6 +31,7 @@ builder.Services.AddScoped<IWorkLogRepository, WorkLogRepository>();
 builder.Services.AddScoped<IWorkLogService, WorkLogService>();
 builder.Services.AddScoped<ITaskFileRepository, TaskFileRepository>();
 builder.Services.AddScoped<ITaskFileService, TaskFileService>();
+builder.Services.AddSingleton<TelegramService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

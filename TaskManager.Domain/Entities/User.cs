@@ -13,11 +13,12 @@ namespace TaskManager.Domain.Entities
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string? TelegramId { get; set; }
 
         public ICollection<Project> Projects { get; set; } = new List<Project>();
-        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>(); // Это должно остаться
-        public ICollection<WorkLog> WorkLogs { get; set; } = new List<WorkLog>(); // Добавляем WorkLogs
-        public ICollection<TaskFile> TaskFiles { get; set; } = new List<TaskFile>(); // Добавляем WorkLogs
+        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>(); 
+        public ICollection<WorkLog> WorkLogs { get; set; } = new List<WorkLog>(); 
+        public ICollection<TaskFile> TaskFiles { get; set; } = new List<TaskFile>(); 
     }
 
 }
