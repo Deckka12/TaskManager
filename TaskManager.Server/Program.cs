@@ -29,6 +29,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IWorkLogRepository, WorkLogRepository>();
 builder.Services.AddScoped<IWorkLogService, WorkLogService>();
+builder.Services.AddScoped<ITaskFileRepository, TaskFileRepository>();
+builder.Services.AddScoped<ITaskFileService, TaskFileService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

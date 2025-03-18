@@ -13,6 +13,7 @@ namespace TaskManager.Infrastructure.DBContext
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<TaskFile> TaskFiles { get; set; }
         public DbSet<WorkLog> WorkLogs { get; set; }
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<Project> Projects { get; set; }
@@ -72,6 +73,8 @@ namespace TaskManager.Infrastructure.DBContext
                 .WithMany(u => u.WorkLogs)
                 .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            
 
             base.OnModelCreating(modelBuilder);
         }

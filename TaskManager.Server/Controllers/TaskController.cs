@@ -41,13 +41,13 @@ namespace TaskManager.Server.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public ActionResult<TaskItem> GetTaskById(Guid id)
+        public async Task<ActionResult<IEnumerable<TaskItem>>> GetTaskById(Guid id)
         {
-            //var task = tasks.FirstOrDefault(t => t.Id == id);
-            //if (task == null)
-            //    return NotFound();
+            var task =  _taskService.GetAllTasks().Result.FirstOrDefault(x => x.Id == id);
+            if (task == null)
+                return NotFound();
 
-            return Ok();
+            return Ok(task);
         }
 
         [HttpPost("delete")]

@@ -41,7 +41,7 @@ namespace TaskManager.Application.Services
 
         public async Task<TaskDTO?> GetTaskByIdAsync(Guid id)
         {
-            var task = await _taskRepository.GetByIdWithWorkLogsAsync(id);
+            var task = await _taskRepository.GetByIdAsync(id);
             return task == null ? null : new TaskDTO
             {
                 Id = task.Id,

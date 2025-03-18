@@ -2,9 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import './TaskList.css'; // Подключаем CSS
 import { AuthContext } from "../context/AuthContext";
-import viewIcon from '../Icons/view.png';
-import editIcon from '../Icons/Edit.png';
-import deleteIcon from '../Icons/Delete.png';
+import TaskDetails from "./TaskDetails"; // Импортируем TaskDetails
 
 // Интерфейсы
 interface TaskItem {
@@ -29,7 +27,7 @@ interface Project {
     description: string;
 }
 
-const API_BASE_URL = "http://192.168.22.53:5213";
+const API_BASE_URL = "http://localhost:5213";
 
 
 const TaskList: React.FC = () => {
@@ -37,6 +35,7 @@ const TaskList: React.FC = () => {
     const [filteredTasks, setFilteredTasks] = useState<TaskItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
+    const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null); // Теперь используем ID задачи
     const [createTask, getCreateTask] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState(1);
     const tasksPerPage = 9;
@@ -55,7 +54,6 @@ const TaskList: React.FC = () => {
     const [projectId, setProjectId] = useState("");
     const [users, setUsers] = useState<User[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
-
 
     useEffect(() => {
         // Загружаем задачи
@@ -177,13 +175,22 @@ const TaskList: React.FC = () => {
     const getPriorityText = (priority: number): string => ["Низкий", "Средний", "Высокий"][priority] || "Неизвестно";
 
     // Функция для открытия модального окна с детальным описанием
-    const openTaskDetails = (task: TaskItem) => {
-        setSelectedTask(task);
-    };
+    //const openTaskDetails = (task: TaskItem) => {
+    //    setSelectedTask(task);
+    //};
 
     // Функция для закрытия модального окна
     const closeTaskDetails = () => {
         setSelectedTask(null);
+    };
+    // Открытие деталей задачи
+    const openTaskDetailss = (taskId: string) => {
+        setSelectedTaskId(taskId);
+    };
+
+    // Закрытие деталей задачи
+    const closeTaskDetailss = () => {
+        setSelectedTaskId(null);
     };
 
     // Функция для открытия модального окна создания задачи
@@ -195,12 +202,11 @@ const TaskList: React.FC = () => {
     const indexOfFirstTask = indexOfLastTask - tasksPerPage;
     const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
     const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
-/*    let imageClassName = "images";*/
 
     return (
         <div className="task-container">
             <h1 className="title">Список задач</h1>
-            
+
             {/* Фильтры */}
             <div className="filters">
                 <input type="text" placeholder="Фильтр по названию"
@@ -235,6 +241,7 @@ const TaskList: React.FC = () => {
                 ) : (
                     <>
                         <div className="task-list">
+
                             {currentTasks.map(task => (
                                 <div key={task.id} className="task-card" /*onClick={() => openTaskDetails(task)}*/>
                                     <h3>{task.title}</h3>
@@ -242,13 +249,13 @@ const TaskList: React.FC = () => {
                                     <p><strong>Статус:</strong> {getStatusText(task.status)}</p>
                                     <p><strong>Приоритет:</strong> {getPriorityText(task.priority)}</p>
                                     <div className="buttonImg">
-                                        <div className="images"><img onClick={() => openTaskDetails(task)} src={viewIcon} alt="Просмотр" /></div>
-                                        {/*{auth?.user?.id != task.userId ? imageClassName = "images" : imageClassName = "imagesDisabled"}*/}
+                                        <div className="images"><img onClick={() => openTaskDetailss(task.id)} src="./src/Icons/view.png" /></div>
+                                        
                                         <div className="images">
-                                            <img src={editIcon} alt="Редактировать" />
+                                            <img src="./src/Icons/Edit.png" />
                                         </div>
                                         {/*{auth?.user?.id != task.userID && <div className="images disalbled"><img src="./src/Icons/Edit.png" /></div>}*/}
-                                        {/*{auth?.user?.id == task.userId &&*/} <div className="images"><img onClick={() => handleDeleteTask(task.id)} src={deleteIcon} alt="Удалить" /></div>
+                                        {auth?.user?.id == task.userId && <div className="images"><img onClick={() => handleDeleteTask(task.id)} src="./src/Icons/Delete.png" /></div>}
                                     </div>
                                 </div>
 
@@ -268,33 +275,7 @@ const TaskList: React.FC = () => {
                     </>
                 )
             )}
-
-            {selectedTask && (
-                <div className="modal-overlay" onClick={closeTaskDetails}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h2>{selectedTask.title}</h2>
-                        <p ><strong>Описание:</strong> {selectedTask.description}</p>
-                        <p><strong>Проект ID:</strong> {selectedTask.projectName}</p>
-                        <p><strong>Статус:</strong> {getStatusText(selectedTask.status)}</p>
-                        <p><strong>Приоритет:</strong> {getPriorityText(selectedTask.priority)}</p>
-                        <p><strong>Ответственный пользователь:</strong> {selectedTask.userName}</p>
-                        {/*{selectedTask.workLogs && selectedTask.workLogs.length > 0 && (*/}
-                        {/*    <>*/}
-                        {/*        <h3>Логи работы:</h3>*/}
-                        {/*        <ul>*/}
-                        {/*            {selectedTask.workLogs.map((log, index) => (*/}
-                        {/*                <li key={index}>{JSON.stringify(log)}</li>*/}
-                        {/*            ))}*/}
-                        {/*        </ul>*/}
-                        {/*    </>*/}
-                        {/*)}*/}
-                        <div className = "divbutton">
-                            <button onClick={closeTaskDetails} className="buttonstyle">Закрыть</button>
-                            <button key={selectedTask.id} onClick={() => handleDeleteTask(selectedTask.id)} className="buttonstyle">Удалить</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {selectedTaskId && <TaskDetails taskId={selectedTaskId} onClose={closeTaskDetailss} />}
 
             {createTask && (
                 <div className="modal-overlay" onClick={closeTaskCreate}>
