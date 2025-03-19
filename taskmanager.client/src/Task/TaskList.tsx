@@ -3,6 +3,12 @@ import axios from 'axios';
 import './TaskList.css'; // Подключаем CSS
 import { AuthContext } from "../context/AuthContext";
 import TaskDetails from "./TaskDetails"; // Импортируем TaskDetails
+import CreateTask from "./CreateTask"; // Импортируем CreateTask
+import API_BASE_URL from "../config";
+
+import viewIcon from '../Icons/view.png';
+import editIcon from '../Icons/Edit.png';
+import deleteIcon from '../Icons/Delete.png';
 
 // Интерфейсы
 interface TaskItem {
@@ -14,27 +20,28 @@ interface TaskItem {
     priority: number;
     userName: string;
     userId: string;
+    categoryID: string;
+    dueDate: Date;
 }
-
 interface User {
     id: string;
     name: string;
 }
-
 interface Project {
     id: string;
     name: string;
     description: string;
 }
-
-const API_BASE_URL = "http://localhost:5213";
+//interface Category {
+//    id: string;
+//    name: string;
+//}
 
 
 const TaskList: React.FC = () => {
     const [tasks, setTasks] = useState<TaskItem[]>([]);
     const [filteredTasks, setFilteredTasks] = useState<TaskItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
     const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null); // Теперь используем ID задачи
     const [createTask, getCreateTask] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -48,12 +55,10 @@ const TaskList: React.FC = () => {
 
     // Данные для фильтров
     const auth = useContext(AuthContext);
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [priority, setPriority] = useState("Medium");
-    const [projectId, setProjectId] = useState("");
+
     const [users, setUsers] = useState<User[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
+    //const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
         // Загружаем задачи
@@ -77,6 +82,11 @@ const TaskList: React.FC = () => {
         axios.get<Project[]>(`${API_BASE_URL}/api/task/project`)
             .then(response => setProjects(response.data))
             .catch(error => console.error('Ошибка при загрузке проектов:', error));
+
+        //// Загружаем категории
+        //axios.get<Category[]>(`${API_BASE_URL}/api/task/categories`)
+        //    .then(response => setCategories(response.data))
+        //    .catch(error => console.error('Ошибка при загрузке категорий:', error));
     }, []);
     // Фильтрация задач
     useEffect(() => {
@@ -107,48 +117,6 @@ const TaskList: React.FC = () => {
                 setLoading(false);
             })
     }
-    // Создание задачи
-    const handleCreateTask = async () => {
-        if (!title.trim() || !description.trim() || !projectId) {
-            alert("Заполните все поля!");
-            return;
-        }
-
-        if (!auth?.user?.id) {
-            alert("Ошибка: не удалось определить пользователя.");
-            return;
-        }
-
-        // Переводим статус и приоритет в Enum
-        const statusEnum = 0; // TaskStatus.New = 0
-        const priorityEnum = priority === "Low" ? 0 : priority === "Medium" ? 1 : 2; // Enum TaskPriority
-
-        const requestBody = {
-            title,
-            description,
-            priority: priorityEnum,
-            projectId,
-            status: statusEnum,
-            userId: auth.user.id
-        };
-
-        console.log("Отправляемые данные:", requestBody);
-
-        try {
-            await axios.post(
-                "https://localhost:7121/api/task/create",
-                requestBody,
-                { headers: { Authorization: `Bearer ${auth?.token}` } }
-            );
-            closeTaskCreate();
-            gettasks();
-            alert("Задача успешно создана!");
-        } catch (error) {
-            console.error("Ошибка при создании задачи:", error);
-            alert("Не достаточно прав.");
-        }
-    };
-
     const handleDeleteTask = async (taskId: string) => {
         if (!auth?.user?.id) {
             alert("Ошибка: не удалось определить пользователя.");
@@ -161,7 +129,7 @@ const TaskList: React.FC = () => {
             });
             console.log("Ответ сервера:", response.data);
             alert("Задача успешно удалена!");
-            closeTaskDetails();
+            closeTaskDetailss();
             gettasks();
         } catch (error) {
             console.error("Ошибка при удалении задачи:", error);
@@ -174,24 +142,11 @@ const TaskList: React.FC = () => {
     const getStatusText = (status: number): string => ["Новая", "В процессе", "Завершена"][status] || "Неизвестно";
     const getPriorityText = (priority: number): string => ["Низкий", "Средний", "Высокий"][priority] || "Неизвестно";
 
-    // Функция для открытия модального окна с детальным описанием
-    //const openTaskDetails = (task: TaskItem) => {
-    //    setSelectedTask(task);
-    //};
-
-    // Функция для закрытия модального окна
-    const closeTaskDetails = () => {
-        setSelectedTask(null);
-    };
     // Открытие деталей задачи
-    const openTaskDetailss = (taskId: string) => {
-        setSelectedTaskId(taskId);
-    };
+    const openTaskDetailss = (taskId: string) => setSelectedTaskId(taskId);
 
     // Закрытие деталей задачи
-    const closeTaskDetailss = () => {
-        setSelectedTaskId(null);
-    };
+    const closeTaskDetailss = () => setSelectedTaskId(null); 
 
     // Функция для открытия модального окна создания задачи
     const openTaskCreate = () => getCreateTask(true);
@@ -249,13 +204,12 @@ const TaskList: React.FC = () => {
                                     <p><strong>Статус:</strong> {getStatusText(task.status)}</p>
                                     <p><strong>Приоритет:</strong> {getPriorityText(task.priority)}</p>
                                     <div className="buttonImg">
-                                        <div className="images"><img onClick={() => openTaskDetailss(task.id)} src="./src/Icons/view.png" /></div>
+                                        <div className="images"><img onClick={() => openTaskDetailss(task.id)} src={viewIcon} /></div>
                                         
                                         <div className="images">
-                                            <img src="./src/Icons/Edit.png" />
+                                            <img src={editIcon} />
                                         </div>
-                                        {/*{auth?.user?.id != task.userID && <div className="images disalbled"><img src="./src/Icons/Edit.png" /></div>}*/}
-                                        {auth?.user?.id == task.userId && <div className="images"><img onClick={() => handleDeleteTask(task.id)} src="./src/Icons/Delete.png" /></div>}
+                                        {auth?.user?.id == task.userId && <div className="images"><img onClick={() => handleDeleteTask(task.id)} src={deleteIcon} /></div>}
                                     </div>
                                 </div>
 
@@ -277,55 +231,7 @@ const TaskList: React.FC = () => {
             )}
             {selectedTaskId && <TaskDetails taskId={selectedTaskId} onClose={closeTaskDetailss} />}
 
-            {createTask && (
-                <div className="modal-overlay" onClick={closeTaskCreate}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="create-task-container">
-                            <h2>Создать задачу</h2>
-                            <div className="createTask">
-                                <input className="inputstyle"
-                                    type="text"
-                                    placeholder="Название задачи"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                />
-                            </div>
-                            <div className="createTask">
-                                <textarea
-                                    placeholder="Описание задачи"
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                />
-                            </div>
-                            <div className="createTask">
-                                <p>Приоритет:  </p>
-                                <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-                                    <option value="Low">Низкий</option>
-                                    <option value="Medium">Средний</option>
-                                    <option value="High">Высокий</option>
-                                </select>
-                            </div>
-                            <div className="createTask">
-                                <p>Проект:</p>
-                                <select value={projectId} onChange={(e) => setProjectId(e.target.value)}>
-                                    <option value="">Выберите проект</option>
-                                    {projects.map((project) => (
-                                        <option key={project.id} value={project.id}>{project.description}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="divbuttons">
-                                <div className="divbuttons">
-                                    <button onClick={handleCreateTask} className="buttonstyle" >Создать задачу</button>
-                                </div>
-                                <div className="divbuttons">
-                                    <button onClick={closeTaskCreate} className="close-button buttonstyle">Закрыть</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {createTask && <CreateTask onClose={closeTaskCreate} getTask={gettasks} />}
 
         </div>
     );

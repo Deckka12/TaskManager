@@ -18,5 +18,6 @@ namespace TaskManager.Application.Interfaces
         Task<IEnumerable<TaskDTO>> GetTasksByUser(Guid userId);
 
         Task<IEnumerable<TaskDtos>> GetAllTasks();
+        Task<IEnumerable<Category>> GetAllCategory();
     }
 }

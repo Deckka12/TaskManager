@@ -13,5 +13,6 @@ namespace TaskManager.Domain.Interface
         Task DeleteAsync(Guid id);
         Task<TaskItem?> GetByIdWithWorkLogsAsync(Guid id);
         Task<IEnumerable<TaskItem>> GetByAllTask();
+        Task<IEnumerable<Category>> GetAllCategory();
     }
 }

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
-
+import API_BASE_URL from "../config";
+import deleteIcon from '../Icons/Delete.png';
 interface TaskDetailsProps {
     taskId: string;
     onClose: () => void;
@@ -16,24 +17,19 @@ interface TaskItem {
     priority: number;
     userName: string;
 }
-
 interface FileItem {
     id: number;
     fileName: string;
 }
 
-const API_BASE_URL = "http://localhost:5213";
-
 const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
     const [task, setTask] = useState<TaskItem | null>(null);
     const [files, setFiles] = useState<FileItem[]>([]);
     const [file, setFile] = useState<File | null>(null);
-    const auth = useContext(AuthContext); // Получаем токен авторизации
+    const [loading, setLoading] = useState(true);
+    const auth = useContext(AuthContext);
 
-    // Проверяем, есть ли токен
     useEffect(() => {
-        console.log("Текущий токен:", auth?.token);
-
         if (!auth?.token) {
             console.error("Ошибка: отсутствует токен авторизации");
             return;
@@ -49,20 +45,15 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
             console.error("Ошибка: Токен отсутствует!");
             return {};
         }
-        return {
-            Authorization: `Bearer ${auth.token}`
-        };
+        return { Authorization: `Bearer ${auth.token}` };
     };
 
     const fetchTaskDetails = async () => {
         try {
-            console.log("Запрашиваем данные задачи...");
-
+            setLoading(true);
             const response = await axios.get<TaskItem>(`${API_BASE_URL}/api/task/${taskId}`, {
                 headers: getAuthHeaders(),
             });
-
-            console.log("Ответ от сервера:", response.data);
 
             if (response.data) {
                 setTask(response.data);
@@ -71,9 +62,10 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
             }
         } catch (error) {
             console.error("Ошибка загрузки задачи:", error);
+        } finally {
+            setLoading(false);
         }
     };
-
 
     // Загружаем файлы задачи
     const fetchFiles = async () => {
@@ -108,12 +100,12 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
             await axios.post(`${API_BASE_URL}/api/task/files/upload/${taskId}`, formData, {
                 headers: {
                     ...getAuthHeaders(),
-                    "Content-Type": "multipart/form-data"
-                }
+                    "Content-Type": "multipart/form-data",
+                },
             });
 
             alert("Файл загружен!");
-            fetchFiles(); // Обновить список файлов
+            fetchFiles();
         } catch (error) {
             console.error("Ошибка загрузки файла:", error);
         }
@@ -136,36 +128,57 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                {task ? (
+                {loading ? (
+                    <p className="loading-text">Загрузка данных...</p>
+                ) : task ? (
                     <>
-                        <h2>{task.title}</h2>
-                        <p><strong>Описание:</strong> {task.description}</p>
-                        <p><strong>Проект:</strong> {task.projectName}</p>
-                        <p><strong>Статус:</strong> {["Новая", "В процессе", "Завершена"][task.status]}</p>
-                        <p><strong>Приоритет:</strong> {["Низкий", "Средний", "Высокий"][task.priority]}</p>
-                        <p><strong>Ответственный:</strong> {task.userName}</p>
+                        <div className="task-details-container">
+                            <h2 className="task-title">{task.title}</h2>
+                            <div className="task-info">
+                                <p><strong>Описание:</strong> {task.description}</p>
+                                <p><strong>Проект:</strong> {task.projectName}</p>
+                                <p><strong>Статус:</strong> {["Новая", "В процессе", "Завершена"][task.status]}</p>
+                                <p><strong>Приоритет:</strong> {["Низкий", "Средний", "Высокий"][task.priority]}</p>
+                                <p><strong>Ответственный:</strong> {task.userName}</p>
+                            </div>
 
-                        {/* Файлы */}
-                        <h3>Файлы</h3>
-                        <input type="file" onChange={handleFileChange} />
-                        <button onClick={handleUpload}>Загрузить</button>
+                            {/* Файлы */}
+                            <h3>Файлы</h3>
+                            <div className="file-upload">
+                                <input type="file" onChange={handleFileChange} />
+                                <button className="button primary" onClick={handleUpload}>Загрузить</button>
+                            </div>
 
-                        <ul>
-                            {files.map((file) => (
-                                <li key={file.id}>
-                                    <a href={`${API_BASE_URL}/api/task/files/download/${file.id}`} target="_blank" rel="noopener noreferrer">
-                                        {file.fileName}
-                                    </a>
-                                    <button onClick={() => handleDeleteFile(file.id)}>Удалить</button>
-                                </li>
-                            ))}
-                        </ul>
+                            <ul className="file-list">
+                                {files.length > 0 ? (
+                                    files.map((file) => (
+                                        <li key={file.id} className="file-item">
+                                            <a
+                                                href={`${API_BASE_URL}/api/task/files/download/${file.id}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="file-link"
+                                            >
+                                                {file.fileName}
+                                            </a>
+                                            <button className="delete-button" onClick={() => handleDeleteFile(file.id)}>
+                                                <img src={deleteIcon} alt="Удалить" className="delete-icon" />
+                                            </button>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="no-files">Файлы отсутствуют.</p>
+                                )}
+                            </ul>
+
+                            <div className="buttons">
+                                <button onClick={onClose} className="button secondary">Закрыть</button>
+                            </div>
+                        </div>
                     </>
                 ) : (
-                    <p>Загрузка...</p>
+                    <p className="error-text">Ошибка загрузки задачи</p>
                 )}
-
-                <button onClick={onClose}>Закрыть</button>
             </div>
         </div>
     );

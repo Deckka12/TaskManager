@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import API_BASE_URL from "../config";
 
 interface User {
     id: string;
@@ -51,11 +52,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await axios.post("http://localhost:5213/api/auth/login", { email, password });
-            localStorage.setItem("token", response.data.token);
-            setToken(response.data.token);
+            const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
+            const token = response.data.token;
+            localStorage.setItem("token", token);
+            setToken(token);
         } catch (error) {
-            console.error("ќшибка входа:", error);
+            console.error("Ошибка входа:", error);
         }
     };
 

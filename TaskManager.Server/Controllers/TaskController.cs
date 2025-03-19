@@ -99,16 +99,20 @@ namespace TaskManager.Server.Controllers
                 });
             }
 
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized();
-            }
+            //if (!User.Identity.IsAuthenticated)
+            //{
+            //    return Unauthorized();
+            //}
 
             var user = await _userService.GetUserByIdAsync(taskDto.UserId);
             if (user == null)
                 return BadRequest("Пользователь не найден");
-
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine("Доступные Claims:");
+            foreach (var claim in User.Claims)
+            {
+                Console.WriteLine($"{claim.Type}: {claim.Value}");
+            }
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
             if (!Guid.TryParse(userIdClaim, out var userId) || userId == Guid.Empty)
             {
                 return BadRequest(new { message = "Ошибка определения пользователя." });
@@ -167,6 +171,18 @@ namespace TaskManager.Server.Controllers
             return Ok(priorities);
         }
 
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategory()
+        {
+            var categorys = await _taskService.GetAllCategory();
+            var categoryModel = categorys.Select(p => new CategoryModel
+            {
+                ID = p.Id.ToString(),
+                Name = p.Name
+            }).ToList();
+            return Ok(categoryModel);
+        }
+
         /// <summary>
         /// Получаеам все задачи
         /// </summary>
@@ -189,6 +205,11 @@ namespace TaskManager.Server.Controllers
     {
         public string ID { get; set; }
         public string Description { get; set; } = string.Empty;
+    }
+    public class CategoryModel
+    {
+        public string ID { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
     public class CreateTaskModel
     {

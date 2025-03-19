@@ -77,7 +77,10 @@ namespace TaskManager.Application.Services
                 Status = taskDto.Status,
                 Priority = taskDto.Priority,
                 UserId = taskDto.UserId,
-                ProjectId = taskDto.ProjectId
+                ProjectId = taskDto.ProjectId,
+                CategotyID = taskDto.CategoryId,
+                DueDate = taskDto.DueDate,
+                PerformerID = taskDto.PerformerId
             };
 
             await _taskRepository.AddAsync(task);
@@ -132,6 +135,12 @@ namespace TaskManager.Application.Services
                 UserName = t.User.Name,
                 UserId = t.UserId
             }).ToList();
+        }
+
+        public async Task<IEnumerable<Category>> GetAllCategory()
+        {
+            var tasks = await _taskRepository.GetAllCategory();
+            return tasks;
         }
     }
 }

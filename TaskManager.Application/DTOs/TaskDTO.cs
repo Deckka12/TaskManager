@@ -31,6 +31,11 @@ namespace TaskManager.Application.DTOs
         public TaskPriority Priority { get; set; } = TaskPriority.Medium;
         public Guid UserId { get; set; }
 
+        [Required(ErrorMessage = "Необходимо выбрать категорию")]
+        public Guid CategoryId { get; set; }
+        public DateTime DueDate { get; set; }
+        public Guid PerformerId { get; set; }
+
         public List<WorkLog>? workLogs { get; set; }
 
         // Локализация статусов

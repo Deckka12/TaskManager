@@ -46,5 +46,10 @@ namespace TaskManager.Infrastructure.Repositories
                .Include(t => t.Project).Include(x => x.User).ToListAsync();
                
         }
+
+        public async Task<IEnumerable<Category>> GetAllCategory()
+        {
+            return await _context.Category.ToListAsync();
+        }
     }
 }

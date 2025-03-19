@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config";
 
 const Register: React.FC = () => {
     const [name, setName] = useState("");
@@ -15,7 +16,7 @@ const Register: React.FC = () => {
         }
 
         try {
-            await axios.post("http://localhost:5213/api/auth/register", { name, email, password });
+            await axios.post(`${API_BASE_URL}/api/auth/register`, { name, email, password });
             alert("Регистрация успешна!");
             navigate("/login"); // Перенаправляем на страницу входа
         } catch (error) {
