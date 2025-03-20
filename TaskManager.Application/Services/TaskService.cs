@@ -133,7 +133,11 @@ namespace TaskManager.Application.Services
                 Priority = t.Priority,
                 ProjectName = t.Project.Name,
                 UserName = t.User.Name,
-                UserId = t.UserId
+                UserId = t.UserId,
+                ProjectId = t.ProjectId,
+                PerformerId = t.PerformerID,
+                DueDate = t.DueDate,
+                CategoryId = t.CategotyID
             }).ToList();
         }
 
@@ -142,5 +146,69 @@ namespace TaskManager.Application.Services
             var tasks = await _taskRepository.GetAllCategory();
             return tasks;
         }
+
+        public async Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskDto updateTaskDto)
+        {
+            var task = await _taskRepository.GetByIdAsync(taskId);
+            if (task == null)
+                return false;
+
+            bool isUpdated = false;
+
+            if (!string.IsNullOrEmpty(updateTaskDto.Title) && task.Title != updateTaskDto.Title)
+            {
+                task.Title = updateTaskDto.Title;
+                isUpdated = true;
+            }
+
+            if (!string.IsNullOrEmpty(updateTaskDto.Description) && task.Description != updateTaskDto.Description)
+            {
+                task.Description = updateTaskDto.Description;
+                isUpdated = true;
+            }
+
+            if (updateTaskDto.Status.HasValue && task.Status != updateTaskDto.Status.Value)
+            {
+                task.Status = updateTaskDto.Status.Value;
+                isUpdated = true;
+            }
+
+            if (updateTaskDto.Priority.HasValue && task.Priority != updateTaskDto.Priority.Value)
+            {
+                task.Priority = updateTaskDto.Priority.Value;
+                isUpdated = true;
+            }
+
+            if (task.DueDate != updateTaskDto.DueDate)
+            {
+                task.DueDate = updateTaskDto.DueDate;
+                isUpdated = true;
+            }
+
+            if (task.PerformerID != updateTaskDto.PerformerId)
+            {
+                task.PerformerID = updateTaskDto.PerformerId;
+                isUpdated = true;
+            }
+            if (task.ProjectId != updateTaskDto.ProjectId)
+            {
+                task.ProjectId = updateTaskDto.ProjectId.Value;
+                isUpdated = true;
+            }
+            if (task.CategotyID != updateTaskDto.CategoryId)
+            {
+                task.CategotyID = updateTaskDto.CategoryId.Value;
+                isUpdated = true;
+            }
+
+            if (!isUpdated)
+                return false;
+
+            task.ChangedDate = DateTime.UtcNow;
+            await _taskRepository.UpdateAsync(task);
+
+            return true;
+        }
+
     }
 }

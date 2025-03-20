@@ -99,26 +99,13 @@ namespace TaskManager.Server.Controllers
                 });
             }
 
-            //if (!User.Identity.IsAuthenticated)
-            //{
-            //    return Unauthorized();
-            //}
+           
 
             var user = await _userService.GetUserByIdAsync(taskDto.UserId);
             if (user == null)
                 return BadRequest("Пользователь не найден");
-            Console.WriteLine("Доступные Claims:");
-            foreach (var claim in User.Claims)
-            {
-                Console.WriteLine($"{claim.Type}: {claim.Value}");
-            }
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            if (!Guid.TryParse(userIdClaim, out var userId) || userId == Guid.Empty)
-            {
-                return BadRequest(new { message = "Ошибка определения пользователя." });
-            }
-
-            taskDto.UserId = userId;
+            
+            taskDto.UserId = user.Id;
 
             var project = await _projectService.GetProjectByIdAsync(taskDto.ProjectId);
             if (project == null)
@@ -129,18 +116,34 @@ namespace TaskManager.Server.Controllers
             try
             {
                 await _taskService.CreateTaskAsync(taskDto);
-                // Отправляем уведомление в Telegram
-                if (!string.IsNullOrEmpty(user.TelegramId))
-                {
-                    var telegramService = HttpContext.RequestServices.GetRequiredService<TelegramService>();
-                    await telegramService.SendNotification(user.TelegramId, $"📌 Вам назначена новая задача: {taskDto.Title}");
-                }
+                //// Отправляем уведомление в Telegram
+                //if (!string.IsNullOrEmpty(user.TelegramId))
+                //{
+                //    var telegramService = HttpContext.RequestServices.GetRequiredService<TelegramService>();
+                //    await telegramService.SendNotification(user.TelegramId, $"📌 Вам назначена новая задача: {taskDto.Title}");
+                //}
                 return Ok(new { message = "Задача успешно создана!" });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Ошибка сервера", error = ex.Message });
             }
+        }
+
+        /// <summary>
+        /// Обновление задачи (изменяются только переданные поля)
+        /// </summary>
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
+        {
+            if (id != updateTaskDto.Id)
+                return BadRequest("Task ID mismatch.");
+
+            var result = await _taskService.UpdateTaskAsync(id, updateTaskDto);
+            if (!result)
+                return NotFound("Задача не найдена или данные не изменились");
+
+            return NoContent();
         }
 
 

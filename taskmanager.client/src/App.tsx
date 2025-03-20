@@ -8,6 +8,7 @@ import CreateProjects from './Project/CreateProject';
 import Login from "./Login/Login";
 
 import Register from "./Login/Register";
+import Footer from './Footer';
 
 
 const App: React.FC = () => {
@@ -25,6 +26,7 @@ const App: React.FC = () => {
                         <Route path="*" element={<h2>Страница не найдена</h2>} />
                     </Routes>
                 </div>
+                <Footer />
             </Router>
         </AuthProvider>
     );

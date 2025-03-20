@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import API_BASE_URL from "../config";
-import { jwtDecode } from "jwt-decode";
 interface User {
     id: string;
     name: string;
@@ -97,7 +96,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay">
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="create-task-container">
                     <h2>Создать задачу</h2>

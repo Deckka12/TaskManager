@@ -25,6 +25,10 @@ namespace TaskManager.Application.DTOs
         public TaskPriority Priority { get; set; } = TaskPriority.Medium;
         public string UserName { get; set; }
         public Guid UserId { get; set; }
+        public Guid ProjectId { get; set; }  // ✅ Добавлено
+        public Guid? PerformerId { get; set; }  // ✅ Добавлено
+        public Guid? CategoryId { get; set; }  // ✅ Добавлено
+        public DateTime? DueDate { get; set; }  // ✅ Добавлено
 
         public List<WorkLog>? workLogs { get; set; }
 

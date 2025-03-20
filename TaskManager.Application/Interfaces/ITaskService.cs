@@ -19,5 +19,6 @@ namespace TaskManager.Application.Interfaces
 
         Task<IEnumerable<TaskDtos>> GetAllTasks();
         Task<IEnumerable<Category>> GetAllCategory();
+        Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskDto updateTaskDto);
     }
 }

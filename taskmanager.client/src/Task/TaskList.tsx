@@ -4,6 +4,7 @@ import './TaskList.css'; // Подключаем CSS
 import { AuthContext } from "../context/AuthContext";
 import TaskDetails from "./TaskDetails"; // Импортируем TaskDetails
 import CreateTask from "./CreateTask"; // Импортируем CreateTask
+import EditTask from "./EditTask";
 import API_BASE_URL from "../config";
 
 import viewIcon from '../Icons/view.png';
@@ -16,6 +17,7 @@ interface TaskItem {
     title: string;
     description: string;
     projectName: string;
+    projectId: string;
     status: number;
     priority: number;
     userName: string;
@@ -46,7 +48,7 @@ const TaskList: React.FC = () => {
     const [createTask, getCreateTask] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState(1);
     const tasksPerPage = 9;
-
+    const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
     // Фильтры
     const [filterUser, setFilterUser] = useState("");
     const [filterPriority, setFilterPriority] = useState("");
@@ -137,13 +139,26 @@ const TaskList: React.FC = () => {
         }
     };
 
-
+    const reloadTasks = async () => {
+        try {
+            const response = await axios.get<TaskItem[]>(`${API_BASE_URL}/api/task`);
+            setTasks(response.data);
+            setFilteredTasks(response.data);
+        } catch (error) {
+            console.error("Ошибка при загрузке задач:", error);
+        }
+    };
     // Функции для получения текстов
     const getStatusText = (status: number): string => ["Новая", "В процессе", "Завершена"][status] || "Неизвестно";
     const getPriorityText = (priority: number): string => ["Низкий", "Средний", "Высокий"][priority] || "Неизвестно";
 
     // Открытие деталей задачи
     const openTaskDetailss = (taskId: string) => setSelectedTaskId(taskId);
+
+    const openTaskEdit = (task: TaskItem) => {
+        console.log("Редактируем задачу:", task);
+        setSelectedTask(task);
+    };
 
     // Закрытие деталей задачи
     const closeTaskDetailss = () => setSelectedTaskId(null); 
@@ -207,7 +222,7 @@ const TaskList: React.FC = () => {
                                         <div className="images"><img onClick={() => openTaskDetailss(task.id)} src={viewIcon} /></div>
                                         
                                         <div className="images">
-                                            <img src={editIcon} />
+                                            <img src={editIcon} onClick={() => openTaskEdit(task)} />
                                         </div>
                                         {auth?.user?.id == task.userId && <div className="images"><img onClick={() => handleDeleteTask(task.id)} src={deleteIcon} /></div>}
                                     </div>
@@ -232,6 +247,16 @@ const TaskList: React.FC = () => {
             {selectedTaskId && <TaskDetails taskId={selectedTaskId} onClose={closeTaskDetailss} />}
 
             {createTask && <CreateTask onClose={closeTaskCreate} getTask={gettasks} />}
+            {selectedTask && (
+                <>
+                    {console.log("Выбранная задача:", selectedTask)}  // ✅ Проверяем, что приходит в `selectedTask`
+                    <EditTask
+                        task={selectedTask}
+                        onClose={() => setSelectedTask(null)}
+                        onTaskUpdated={reloadTasks}
+                    />
+                </>
+            )}
 
         </div>
     );
