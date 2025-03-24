@@ -1,126 +1,115 @@
-/* Общий контейнер */
+п»ї/* РћР±С‰РёР№ РєРѕРЅС‚РµР№РЅРµСЂ */
 .project-container {
     max-width: 90%;
     margin: 20px auto;
     padding: 25px;
-    background-color: #f4f4f9;
+    background: white;
     border-radius: 12px;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Заголовок */
+/* Р—Р°РіРѕР»РѕРІРѕРє */
 .title {
-    font-size: 30px;
+    font-size: 32px;
+    font-weight: bold;
     color: #2c3e50;
     margin-bottom: 20px;
-    font-weight: bold;
 }
-/* Кнопка "Создать" */
+/* РљРЅРѕРїРєР° "РЎРѕР·РґР°С‚СЊ" */
 .buttonstyle {
-    background-color: #2c3e50;
+    background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
     padding: 10px 15px;
     font-size: 14px;
     font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     margin: 3px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
     .buttonstyle:hover {
-        background-color: #0056b3;
-        box-shadow: 0 4px 8px rgba(0, 91, 187, 0.3);
+        background: linear-gradient(135deg, #0056b3, #003f8c);
+        box-shadow: 0px 5px 15px rgba(0, 91, 187, 0.3);
+        transform: translateY(-2px);
     }
 
-/* Текст "Загрузка..." */
+/* РўРµРєСЃС‚ "Р—Р°РіСЂСѓР·РєР°..." */
 .loading-text {
     font-size: 18px;
     color: #555;
 }
 
-/* Сообщение о пустом списке */
+/* РЎРѕРѕР±С‰РµРЅРёРµ Рѕ РїСѓСЃС‚РѕРј СЃРїРёСЃРєРµ */
 .no-projects {
     font-size: 18px;
     color: #777;
 }
 
-/* Сетка для списка задач (3 в ряд) */
+/* РЎРµС‚РєР° РґР»СЏ СЃРїРёСЃРєР° Р·Р°РґР°С‡ (3 РІ СЂСЏРґ) */
 .project-list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     justify-content: center;
 }
 
-/* Карточка задачи */
+/* РљР°СЂС‚РѕС‡РєР° Р·Р°РґР°С‡Рё */
 .project-card {
-    background: white;
-    padding: 18px;
-    border-radius: 8px;
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    padding: 20px;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
     text-align: left;
-    transition: transform 0.2s ease-in-out;
-    /*cursor: pointer;*/
-    word-break: break-word;
+    transition: all 0.3s ease-in-out;
+    border-left: 6px solid #007bff;
+    position: relative;
 }
 
     .project-card:hover {
-       /* transform: scale(1.02);*/
+        transform: scale(1.02);
+        box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.15);
     }
     .project-card h3 {
         font-size: 18px;
-        color: #333;
-        margin-bottom: 5px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 8px;
     }
 
 .images {
-    width: 2px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     display: inline-flex;
-  
-    padding-left: 10px;
-    padding-right: 10px;
-    float: right;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
     .images:hover {
-        /*  transform: translateY(-2px);
-        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);*/
-        cursor: pointer;
-    }
-/* Модальное окно */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
+        transform: scale(1.1);
+        filter: brightness(1.2);
+    }/* РњРѕРґР°Р»СЊРЅРѕРµ РѕРєРЅРѕ */
 .modal-content {
     background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
     text-align: center;
-    width: 400px;
+    width: 450px;
     animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Кнопка закрытия */
+/* рџџў РљРЅРѕРїРєР° Р·Р°РєСЂС‹С‚РёСЏ */
 .close-button {
-    background: #ff4b5c;
+    background: #e74c3c;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 16px;
     cursor: pointer;
     margin-top: 15px;
     border-radius: 6px;
@@ -129,8 +118,75 @@
 }
 
     .close-button:hover {
-        background: #d43f51;
+        background: #c0392b;
+        box-shadow: 0px 5px 10px rgba(255, 89, 64, 0.3);
     }
+
+/* рџџў РђРЅРёРјР°С†РёСЏ РїРѕСЏРІР»РµРЅРёСЏ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* рџџў РџР°РіРёРЅР°С†РёСЏ */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+    .pagination button {
+        padding: 10px 15px;
+        border: none;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003f8c);
+            transform: translateY(-2px);
+        }
+
+/* РџРѕР»СЏ РІРІРѕРґР° */
+.inputstyle {
+    border: 2px solid #ced4da;
+    border-radius: 5px;
+    padding: 8px;
+    width: 100%;
+    font-size: 14px;
+    transition: border 0.3s ease-in-out;
+}
+
+    .inputstyle:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+/* РљРѕРЅС‚РµР№РЅРµСЂ РґР»СЏ С„РѕСЂРјС‹ СЃРѕР·РґР°РЅРёСЏ Р·Р°РґР°С‡Рё */
+.createTask {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
 .divbuttons {
     display: flex;
@@ -148,6 +204,34 @@
 .buttonImg {
     float: right;
 }
+
+.imagesdisabled {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    padding-left: 5px;
+    padding-right: 5px;
+    pointer-events: none;
+}
+
+.images {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+    .images:hover {
+        /*  transform: translateY(-2px);
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);*/
+        cursor: pointer;
+    }
+
+p {
+    word-break: break-word;
+}
+
 .divbutton {
     float: right;
     text-align: right;
@@ -156,6 +240,179 @@
 strong {
     float: left;
 }
-p {
-    word-break: break-word;
+
+.input-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
 }
+
+    .input-group label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+.form-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button {
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-weight: bold;
+}
+
+    .button.primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+        .button.primary:hover {
+            background-color: #0056b3;
+        }
+
+    .button.secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+        .button.secondary:hover {
+            background-color: #5a6268;
+        }
+
+
+
+
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9f9f9;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+}
+
+.file-link {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 14px;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.delete-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.delete-button:hover .delete-icon {
+    opacity: 1;
+}
+
+.task-details-container {
+    background: white;
+    padding: 20px;
+    /*border-radius: 8px;*/
+    /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);*/
+    max-width: 450px;
+    text-align: left;
+}
+
+.task-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.task-info p {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+    .task-info p:last-child {
+        border-bottom: none;
+    }
+
+.task-info strong {
+    color: #333;
+    min-width: 120px;
+}
+
+.task-info span {
+    color: #555;
+    text-align: right;
+    flex-grow: 1;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+    .button.secondary {
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin: 3px;
+    }
+
+        .button.secondary:hover {
+            background-color: #dc3545;
+        }

@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TaskManager.Application.DTOs;
 using TaskManager.Application.Interfaces;
@@ -18,23 +20,46 @@ namespace TaskManager.Server.Controllers
         private readonly IUserService _userService;
         private readonly ITaskService _taskService;
         private readonly IProjectService _projectService;
-        public TaskController(ITaskService taskService, IProjectService projectService, IUserService userService) 
+        private readonly IDistributedCache _cache;
+        private readonly ILogger<TaskController> _logger;
+        public TaskController(ITaskService taskService, IProjectService projectService, IUserService userService, IDistributedCache cache, ILogger<TaskController> logger) 
         {
             _projectService = projectService;
             _userService = userService;
             _taskService = taskService;
+            _cache = cache;
+            _logger = logger;
         }
 
         /// <summary>
-        /// Получаеам все задачи
+        /// Получаем все задачи (с кешированием)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Список задач</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasks()
         {
+            //const string cacheKey = "all_tasks";
+            //var cached = await _cache.GetStringAsync(cacheKey);
+
+            //if (!string.IsNullOrEmpty(cached))
+            //{
+            //    var cachedTasks = JsonSerializer.Deserialize<List<TaskItem>>(cached);
+            //    return Ok(cachedTasks);
+            //}
+
             var tasks = await _taskService.GetAllTasks();
+
+            //var json = JsonSerializer.Serialize(tasks);
+            //var options = new DistributedCacheEntryOptions
+            //{
+            //    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            //};
+            //_logger.LogInformation("✅ Задачи успешно получены");
+            //await _cache.SetStringAsync(cacheKey, json, options);
+
             return Ok(tasks);
         }
+
 
         /// <summary>
         /// Получаем задачи по ИД
@@ -88,40 +113,17 @@ namespace TaskManager.Server.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] TaskDTO taskDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    message = "Ошибка валидации",
-                    errors = ModelState
-                        .Where(kv => kv.Value.Errors.Count > 0)
-                        .ToDictionary(kv => kv.Key, kv => kv.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-                });
-            }
-
-           
-
             var user = await _userService.GetUserByIdAsync(taskDto.UserId);
             if (user == null)
                 return BadRequest("Пользователь не найден");
             
             taskDto.UserId = user.Id;
 
-            var project = await _projectService.GetProjectByIdAsync(taskDto.ProjectId);
-            if (project == null)
-            {
-                return BadRequest(new { message = "Выбранный проект не существует." });
-            }
-
             try
             {
                 await _taskService.CreateTaskAsync(taskDto);
-                //// Отправляем уведомление в Telegram
-                //if (!string.IsNullOrEmpty(user.TelegramId))
-                //{
-                //    var telegramService = HttpContext.RequestServices.GetRequiredService<TelegramService>();
-                //    await telegramService.SendNotification(user.TelegramId, $"📌 Вам назначена новая задача: {taskDto.Title}");
-                //}
+                await _cache.RemoveAsync("all_tasks");
+                _logger.LogInformation($"/api/task/create: Задача успешно создана пользователем {user.Name}");
                 return Ok(new { message = "Задача успешно создана!" });
             }
             catch (Exception ex)
@@ -159,10 +161,11 @@ namespace TaskManager.Server.Controllers
             }).ToList();
             return Ok(projectModel);
         }
+
         [HttpGet("priorities")]
         public async Task<IActionResult> GetPriorities()
         {
-            var priorities = Enum.GetValues(typeof(TaskManager.Domain.Enums.TaskPriority ))
+            var priorities = Enum.GetValues(typeof(TaskManager.Domain.Enums.TaskPriority))
                                  .Cast<TaskManager.Domain.Enums.TaskPriority>()
                                  .Select(p => new PriorityModel
                                  {

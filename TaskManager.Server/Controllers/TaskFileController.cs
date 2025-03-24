@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManager.Application.DTOs;
 using TaskManager.Application.Interfaces;
 using TaskManager.Domain.Entities;
 
@@ -24,22 +25,24 @@ namespace TaskManager.Server.Controllers
         /// Загрузка файла в задачу
         /// </summary>
         [HttpPost("upload/{taskId}")]
-        public async Task<IActionResult> UploadFile(Guid taskId, [FromForm] IFormFile file)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadFile(Guid taskId, [FromForm] FileUploadDto model)
         {
+            var file = model.File;
+
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "Файл не выбран" });
 
-            using (var ms = new MemoryStream())
-            {
-                await file.CopyToAsync(ms);
-                bool success = await _taskFileService.UploadFileAsync(taskId, file.FileName, ms.ToArray(), file.ContentType);
+            using var ms = new MemoryStream();
+            await file.CopyToAsync(ms);
 
-                if (!success)
-                    return NotFound(new { message = "Задача не найдена" });
+            bool success = await _taskFileService.UploadFileAsync(taskId, file.FileName, ms.ToArray(), file.ContentType);
+            if (!success)
+                return NotFound(new { message = "Задача не найдена" });
 
-                return Ok(new { message = "Файл успешно загружен!" });
-            }
+            return Ok(new { message = "Файл успешно загружен!" });
         }
+
 
         /// <summary>
         /// Получение списка файлов для задачи

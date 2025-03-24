@@ -18,7 +18,8 @@ namespace TaskManager.Domain.Entities
         public ICollection<Project> Projects { get; set; } = new List<Project>();
         public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>(); 
         public ICollection<WorkLog> WorkLogs { get; set; } = new List<WorkLog>(); 
-        public ICollection<TaskFile> TaskFiles { get; set; } = new List<TaskFile>(); 
+        public ICollection<TaskFile> TaskFiles { get; set; } = new List<TaskFile>();
+        public ICollection<ProjectUserRole> ProjectUserRoles { get; set; }
     }
 
 }

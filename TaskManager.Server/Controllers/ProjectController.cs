@@ -29,18 +29,15 @@ namespace TaskManager.Server.Controllers
                 });
             }
 
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized();
-            }
+           
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(userIdClaim, out var userId) || userId == Guid.Empty)
-            {
-                return BadRequest(new { message = "Ошибка определения пользователя." });
-            }
+            //var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (!Guid.TryParse(userIdClaim, out var userId) || userId == Guid.Empty)
+            //{
+            //    return BadRequest(new { message = "Ошибка определения пользователя." });
+            //}
 
-            projectDto.OwnerId = userId;
+            
 
             try
             {

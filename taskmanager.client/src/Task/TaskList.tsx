@@ -11,6 +11,8 @@ import viewIcon from '../Icons/view.png';
 import editIcon from '../Icons/Edit.png';
 import deleteIcon from '../Icons/Delete.png';
 
+import log from 'loglevel';
+
 // Интерфейсы
 interface TaskItem {
     id: string;
@@ -47,7 +49,7 @@ const TaskList: React.FC = () => {
     const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null); // Теперь используем ID задачи
     const [createTask, getCreateTask] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const tasksPerPage = 9;
+    const tasksPerPage = 15;
     const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
     // Фильтры
     const [filterUser, setFilterUser] = useState("");
@@ -69,6 +71,7 @@ const TaskList: React.FC = () => {
                 setTasks(response.data);
                 setFilteredTasks(response.data);
                 setLoading(false);
+                log.info("Загрузили");
             })
             .catch(error => {
                 console.error('Ошибка при загрузке задач:', error);
@@ -213,8 +216,8 @@ const TaskList: React.FC = () => {
                         <div className="task-list">
 
                             {currentTasks.map(task => (
-                                <div key={task.id} className="task-card" /*onClick={() => openTaskDetails(task)}*/>
-                                    <h3>{task.title}</h3>
+                                <div key={task.id} className={`task-card ${task.priority === 0 ? "priority-low" : task.priority === 1 ? "priority-medium" : "priority-high"}`}>
+                                    <h3 className= "hidetext">{task.title}</h3>
                                     <p className="hidetext"> {task.description}</p>
                                     <p><strong>Статус:</strong> {getStatusText(task.status)}</p>
                                     <p><strong>Приоритет:</strong> {getPriorityText(task.priority)}</p>
