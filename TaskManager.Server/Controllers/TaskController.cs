@@ -38,26 +38,34 @@ namespace TaskManager.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasks()
         {
-            //const string cacheKey = "all_tasks";
-            //var cached = await _cache.GetStringAsync(cacheKey);
+            try
+            {
+                //const string cacheKey = "all_tasks";
+                //var cached = await _cache.GetStringAsync(cacheKey);
 
-            //if (!string.IsNullOrEmpty(cached))
-            //{
-            //    var cachedTasks = JsonSerializer.Deserialize<List<TaskItem>>(cached);
-            //    return Ok(cachedTasks);
-            //}
+                //if (!string.IsNullOrEmpty(cached))
+                //{
+                //    var cachedTasks = JsonSerializer.Deserialize<List<TaskItem>>(cached);
+                //    return Ok(cachedTasks);
+                //}
 
-            var tasks = await _taskService.GetAllTasks();
+                var tasks = await _taskService.GetAllTasks();
 
-            //var json = JsonSerializer.Serialize(tasks);
-            //var options = new DistributedCacheEntryOptions
-            //{
-            //    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            //};
-            //_logger.LogInformation("✅ Задачи успешно получены");
-            //await _cache.SetStringAsync(cacheKey, json, options);
+                //var json = JsonSerializer.Serialize(tasks);
+                //var options = new DistributedCacheEntryOptions
+                //{
+                //    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                //};
+                //_logger.LogInformation("Задачи успешно получены");
+                //await _cache.SetStringAsync(cacheKey, json, options);
 
-            return Ok(tasks);
+                return Ok(tasks);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest();
+            }
+            
         }
 
 
@@ -148,20 +156,6 @@ namespace TaskManager.Server.Controllers
             return NoContent();
         }
 
-
-        [HttpGet("project")]
-        public async Task<IActionResult> GetProject()
-        {
-            var projects = await _projectService.GetAllProjectsAsync();
-            var projectModel = projects.Select(p => new ProjectModel
-            {
-                ID = p.Id.ToString(),
-                Description = p.Description,
-                Name = p.Name
-            }).ToList();
-            return Ok(projectModel);
-        }
-
         [HttpGet("priorities")]
         public async Task<IActionResult> GetPriorities()
         {
@@ -200,12 +194,7 @@ namespace TaskManager.Server.Controllers
             return Ok(tasks);
         }
     }
-    public class ProjectModel
-    {
-        public string ID { get; set; }
-        public string Description { get; set; }
-        public string Name { get; set; }
-    }
+    
 
     public class PriorityModel
     {

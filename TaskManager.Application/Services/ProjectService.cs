@@ -23,12 +23,21 @@ namespace TaskManager.Application.Services
 
         public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
         {
-            var projects = await _projectRepository.GetAllAsync();
+            var projects = await _projectRepository.GetAllProjectsAsync();
+
             return projects.Select(p => new ProjectDTO
             {
                 Id = p.Id,
                 Name = p.Name,
-                Description = p.Description
+                Description = p.Description,
+                OwnerId = p.OwnerId,
+                UserRoles = p.ProjectUserRoles.Select(pur => new ProjectUserRoleDTO
+                {
+                    UserId = pur.UserId,
+                    UserName = pur.User.Name,       
+                    RoleId = pur.RoleId,
+                    RoleName = pur.Role.Name           
+                }).ToList() ?? new List<ProjectUserRoleDTO>()
             }).ToList();
         }
 
@@ -45,22 +54,34 @@ namespace TaskManager.Application.Services
 
         public async Task CreateProjectAsync(ProjectDTO projectDto)
         {
-            // Проверяем, существует ли пользователь
             var userExists = await _userRepository.GetByIdAsync(projectDto.OwnerId);
             if (userExists == null)
             {
                 throw new InvalidOperationException("Пользователь с таким ID не существует.");
             }
+            var projectId = Guid.NewGuid();
+
+            var projectUserRoles = projectDto.UserRoles
+                .GroupBy(ur => new { ur.UserId, ur.RoleId }) // защита от дубликатов
+                .Select(g => g.First())
+                .Select(ur => new ProjectUserRole
+                {
+                    UserId = ur.UserId,
+                    RoleId = ur.RoleId,
+                    ProjectId = projectId
+                }).ToList();
 
             var project = new Project
             {
-                Id = Guid.NewGuid(),
+                Id = projectId,
                 Name = projectDto.Name,
                 Description = projectDto.Description,
-                OwnerId = projectDto.OwnerId
+                OwnerId = projectDto.OwnerId,
+                ProjectUserRoles = projectUserRoles
             };
 
             await _projectRepository.AddAsync(project);
+
         }
 
 

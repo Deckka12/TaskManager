@@ -12,5 +12,6 @@ namespace TaskManager.Application.DTOs
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public Guid OwnerId { get; set; }
+        public List<ProjectUserRoleDTO> UserRoles { get; set; } = new();
     }
 }

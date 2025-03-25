@@ -14,7 +14,7 @@ namespace TaskManager.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<ProjectUserRole> builder)
         {
-            builder.HasKey(pur => new { pur.UserId, pur.ProjectId });
+            builder.HasKey(pur => new { pur.UserId, pur.ProjectId, pur.RoleId });
 
             builder.HasOne(pur => pur.User)
                 .WithMany(u => u.ProjectUserRoles)

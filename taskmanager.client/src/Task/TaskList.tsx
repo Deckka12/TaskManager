@@ -84,7 +84,7 @@ const TaskList: React.FC = () => {
             .catch(error => console.error('Ошибка при загрузке пользователей:', error));
 
         // Загружаем проекты
-        axios.get<Project[]>(`${API_BASE_URL}/api/task/project`)
+        axios.get<Project[]>(`${API_BASE_URL}/api/project/project`)
             .then(response => setProjects(response.data))
             .catch(error => console.error('Ошибка при загрузке проектов:', error));
 

@@ -29,16 +29,6 @@ namespace TaskManager.Server.Controllers
                 });
             }
 
-           
-
-            //var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //if (!Guid.TryParse(userIdClaim, out var userId) || userId == Guid.Empty)
-            //{
-            //    return BadRequest(new { message = "Ошибка определения пользователя." });
-            //}
-
-            
-
             try
             {
                 await _projectService.CreateProjectAsync(projectDto);
@@ -46,8 +36,45 @@ namespace TaskManager.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Ошибка сервера", error = ex.Message });
+                return StatusCode(500, new { message = "Ошибка сервера", error = ex.ToString() });
             }
         }
+
+        [HttpGet("project")]
+        public async Task<IActionResult> GetProject()
+        {
+            var projects = await _projectService.GetAllProjectsAsync();
+
+            var projectModel = projects.Select(p => new ProjectModel
+            {
+                ID = p.Id.ToString(),
+                Description = p.Description,
+                Name = p.Name,
+                UserRoles = p.UserRoles.Select(ur => new ProjectUserRoleModel
+                {
+                    UserId = ur.UserId.ToString(),
+                    RoleId = ur.RoleId.ToString(),
+                    RoleName = ur.RoleName.ToString(),
+                    UserName = ur.UserName.ToString(),
+                }).ToList()
+            }).ToList();
+
+            return Ok(projectModel);
+        }
+
+    }
+    public class ProjectModel
+    {
+        public string ID { get; set; }
+        public string Description { get; set; }
+        public string Name { get; set; }
+        public List<ProjectUserRoleModel> UserRoles { get; set; } = new();
+    }
+    public class ProjectUserRoleModel
+    {
+        public string UserId { get; set; } = string.Empty;
+        public string RoleId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string RoleName { get; set; } = string.Empty;
     }
 }
