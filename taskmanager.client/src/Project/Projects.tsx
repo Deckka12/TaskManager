@@ -68,6 +68,10 @@ const Projects: React.FC = () => {
                                     <div className="images"><img onClick={() => openProjectDetails(project)} src="./src/Icons/view.png" /></div>
                                     <div className="images"><img src="./src/Icons/Edit.png" /></div>
                                     <div className="images"><img /*onClick={() => handleDeleteTask(task.id)}*/ src="./src/Icons/Delete.png" /></div>
+                                    <div className="images"><button className="buttonstyle" onClick={() => navigate(`/project/${project.id}`)}>
+                                        Открыть
+                                    </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>

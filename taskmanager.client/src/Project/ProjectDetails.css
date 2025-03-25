@@ -1,0 +1,18 @@
+.project-details-layout {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.project-tasks {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.project-sidebar {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+}
