@@ -68,6 +68,43 @@ namespace TaskManager.Server.Controllers
             
         }
 
+        /// <summary>
+        /// Получаем все задачи (с кешированием)
+        /// </summary>
+        /// <returns>Список задач</returns>
+        [HttpGet("myTasks/{id}")]
+        public async Task<ActionResult<IEnumerable<TaskItem>>> GetMyTasks(Guid id)
+        {
+            try
+            {
+                //const string cacheKey = "all_tasks";
+                //var cached = await _cache.GetStringAsync(cacheKey);
+
+                //if (!string.IsNullOrEmpty(cached))
+                //{
+                //    var cachedTasks = JsonSerializer.Deserialize<List<TaskItem>>(cached);
+                //    return Ok(cachedTasks);
+                //}
+
+                var tasks = await _taskService.GetTasksByUser(id);
+
+                //var json = JsonSerializer.Serialize(tasks);
+                //var options = new DistributedCacheEntryOptions
+                //{
+                //    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                //};
+                //_logger.LogInformation("Задачи успешно получены");
+                //await _cache.SetStringAsync(cacheKey, json, options);
+
+                return Ok(tasks);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+
+        }
+
 
         /// <summary>
         /// Получаем задачи по ИД

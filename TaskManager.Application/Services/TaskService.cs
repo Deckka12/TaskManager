@@ -109,15 +109,23 @@ namespace TaskManager.Application.Services
             }
         }
 
-        public async Task<IEnumerable<TaskDTO>> GetTasksByUser(Guid userId)
+        public async Task<IEnumerable<TaskDtos>> GetTasksByUser(Guid userId)
         {
             var tasks = await _taskRepository.GetByUserIdAsync(userId);  // Используем метод репозитория для получения задач
-            return tasks.Select(t => new TaskDTO
+            return tasks.Select(t => new TaskDtos
             {
                 Id = t.Id,
                 Title = t.Title,
+                Description = t.Description,
                 Status = t.Status,
-                Priority = t.Priority // Добавляем дату создания, если необходимо
+                Priority = t.Priority,
+                ProjectName = t.Project.Name,
+                UserName = t.User.Name,
+                UserId = t.UserId,
+                ProjectId = t.ProjectId,
+                PerformerId = t.PerformerID,
+                DueDate = t.DueDate,
+                CategoryId = t.CategotyID
             }).ToList();
         }
 
@@ -210,5 +218,24 @@ namespace TaskManager.Application.Services
             return true;
         }
 
+        public async Task<IEnumerable<TaskDtos>> GetTasksByProjectIdAsync(Guid guid)
+        {
+            var tasksbyProject =  await _taskRepository.GetTasksByProjectIdAsync(guid);
+            return tasksbyProject.Select(t => new TaskDtos
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Description = t.Description,
+                Status = t.Status,
+                Priority = t.Priority,
+                ProjectName = t.Project.Name,
+                UserName = t.User.Name,
+                UserId = t.UserId,
+                ProjectId = t.ProjectId,
+                PerformerId = t.PerformerID,
+                DueDate = t.DueDate,
+                CategoryId = t.CategotyID
+            }).ToList();
+        }
     }
 }

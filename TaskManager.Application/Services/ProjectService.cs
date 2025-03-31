@@ -43,12 +43,21 @@ namespace TaskManager.Application.Services
 
         public async Task<ProjectDTO?> GetProjectByIdAsync(Guid id)
         {
-            var project = await _projectRepository.GetByIdAsync(id);
-            return project == null ? null : new ProjectDTO
+            var project = await _projectRepository.GetProjectByIdAsync(id);
+            return  new ProjectDTO
             {
                 Id = project.Id,
                 Name = project.Name,
-                Description = project.Description
+                Description = project.Description,
+                OwnerId = project.OwnerId,
+                OwnerName = project.Owner.Name,
+                UserRoles = project.ProjectUserRoles.Select(pur => new ProjectUserRoleDTO
+                {
+                    UserId = pur.UserId,
+                    UserName = pur.User.Name,
+                    RoleId = pur.RoleId,
+                    RoleName = pur.Role.Name
+                }).ToList() ?? new List<ProjectUserRoleDTO>()
             };
         }
 

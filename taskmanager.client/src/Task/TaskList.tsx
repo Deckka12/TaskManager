@@ -66,7 +66,7 @@ const TaskList: React.FC = () => {
 
     useEffect(() => {
         // Загружаем задачи
-        axios.get<TaskItem[]>(`${API_BASE_URL}/api/task`)
+        axios.get<TaskItem[]>(`${API_BASE_URL}/api/task/myTasks/${auth?.user?.id}`)
             .then(response => {
                 setTasks(response.data);
                 setFilteredTasks(response.data);

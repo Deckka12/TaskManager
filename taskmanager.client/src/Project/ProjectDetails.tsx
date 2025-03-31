@@ -13,60 +13,111 @@ interface TaskItem {
     userName: string;
 }
 
+interface ProjectUserRole {
+    userId: string;
+    userName: string;
+    roleId: string;
+    roleName: string;
+}
 interface ProjectDetailsData {
     id: string;
     name: string;
     description: string;
-    ownerId: string;
+    ownerName: string;
+    userId: string;
+    userRoles: ProjectUserRole[];
 }
 
-const getStatusText = (status: number) => ["Новая", "В процессе", "Завершена"][status] || "Неизвестно";
-const getPriorityText = (priority: number) => ["Низкий", "Средний", "Высокий"][priority] || "Неизвестно";
+const getStatusText = (status: number) => ["РќРѕРІР°СЏ", "Р’ РїСЂРѕС†РµСЃСЃРµ", "Р—Р°РІРµСЂС€РµРЅР°"][status] || "РќРµРёР·РІРµСЃС‚РЅРѕ";
+const getPriorityText = (priority: number) => ["РќРёР·РєРёР№", "РЎСЂРµРґРЅРёР№", "Р’С‹СЃРѕРєРёР№"][priority] || "РќРµРёР·РІРµСЃС‚РЅРѕ";
 
 const ProjectDetails: React.FC = () => {
     const { id } = useParams();
     const [tasks, setTasks] = useState<TaskItem[]>([]);
     const [project, setProject] = useState<ProjectDetailsData | null>(null);
+    const [filteredTasks, setFilteredTasks] = useState<TaskItem[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const tasksPerPage = 15;
 
     useEffect(() => {
         if (id) {
-            axios.get(`${API_BASE_URL}/api/task/by-project/${id}`)
-                .then(res => setTasks(res.data))
-                .catch(err => console.error('Ошибка загрузки задач проекта:', err));
+            axios.get(`${API_BASE_URL}/api/project/projectID/${id}`)
+                .then(res => {
+                    setTasks(res.data);
+                    setFilteredTasks(res.data);
+                }
+                )
+                .catch(err => console.error('РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё Р·Р°РґР°С‡ РїСЂРѕРµРєС‚Р°:', err));
 
-            axios.get(`${API_BASE_URL}/api/task/project/${id}`)
+            axios.get(`${API_BASE_URL}/api/project/${id}`)
                 .then(res => setProject(res.data))
-                .catch(err => console.error('Ошибка загрузки проекта:', err));
+                .catch(err => console.error('РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РїСЂРѕРµРєС‚Р°:', err));
         }
     }, [id]);
+
+    // РџР°РіРёРЅР°С†РёСЏ
+    const indexOfLastTask = currentPage * tasksPerPage;
+    const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+    const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
+    const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
 
     return (
         <div className="project-details-layout">
             <div className="project-tasks">
-                <h2>Задачи проекта</h2>
-                {tasks.length === 0 ? <p>Нет задач.</p> : (
-                    <div className="task-list">
-                        {tasks.map(task => (
-                            <div key={task.id} className="task-card">
-                                <h4>{task.title}</h4>
-                                <p>{task.description}</p>
-                                <p><strong>Статус:</strong> {getStatusText(task.status)}</p>
-                                <p><strong>Приоритет:</strong> {getPriorityText(task.priority)}</p>
-                                <p><strong>Исполнитель:</strong> {task.userName}</p>
-                            </div>
-                        ))}
-                    </div>
+                <h2>Р—Р°РґР°С‡Рё РїСЂРѕРµРєС‚Р°</h2>
+                {tasks.length === 0 ? <p>РќРµС‚ Р·Р°РґР°С‡.</p> : (
+                    <>
+                        <div className="task-list">
+                            {currentTasks.map(task => (
+                                <div key={task.id} className="task-card">
+                                    <h4>{task.title}</h4>
+                                    <p>{task.description}</p>
+                                    <p><strong>РЎС‚Р°С‚СѓСЃ:</strong> {getStatusText(task.status)}</p>
+                                    <p><strong>РџСЂРёРѕСЂРёС‚РµС‚:</strong> {getPriorityText(task.priority)}</p>
+                                    <p><strong>РСЃРїРѕР»РЅРёС‚РµР»СЊ:</strong> {task.userName}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="pagination">
+                            <button className="buttonstyle" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                                РќР°Р·Р°Рґ
+                            </button>
+                            <span>РЎС‚СЂР°РЅРёС†Р° {currentPage} РёР· {totalPages}</span>
+                            <button className="buttonstyle" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                                Р’РїРµСЂС‘Рґ
+                            </button>
+                        </div>
+                    </>
                 )}
+
             </div>
+
             <div className="project-sidebar">
-                <h3>О проекте</h3>
+                <h3>Рћ РїСЂРѕРµРєС‚Рµ</h3>
                 {project ? (
                     <>
-                        <p><strong>Название:</strong> {project.name}</p>
-                        <p><strong>Описание:</strong> {project.description}</p>
-                        <p><strong>Владелец:</strong> {project.ownerId}</p>
+                        <p><strong>РќР°Р·РІР°РЅРёРµ:</strong> {project.name}</p>
+                        <p><strong>РћРїРёСЃР°РЅРёРµ:</strong> {project.description}</p>
+                        <p><strong>РћС‚РІРµС‚СЃС‚РІРµРЅРЅС‹Р№: </strong> {project.ownerName}</p>
+                        {project.userRoles && project.userRoles.length > 0 && (
+                            <div style={{ marginTop: '15px', textAlign: 'left' }}>
+                                <strong>РЈС‡Р°СЃС‚РЅРёРєРё:</strong>
+                                <br></br>
+                                {Object.entries(
+                                    project.userRoles.reduce((acc, curr) => {
+                                        if (!acc[curr.roleName]) acc[curr.roleName] = [];
+                                        acc[curr.roleName].push(curr.userName);
+                                        return acc;
+                                    }, {} as Record<string, string[]>)
+                                ).map(([roleName, users], index) => (
+                                    <p key={index} style={{ margin: '6px 0' }}>
+                                        <strong>{roleName}:</strong> {users.join(', ')}
+                                    </p>
+                                ))}
+                            </div>
+                        )}
                     </>
-                ) : <p>Загрузка...</p>}
+                ) : <p>Р—Р°РіСЂСѓР·РєР°...</p>}
             </div>
         </div>
     );

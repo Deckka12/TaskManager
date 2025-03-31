@@ -11,9 +11,8 @@ const Header: React.FC = () => {
             <div className="header-container">
                 <h1 className="logo">TaskManager</h1>
                 <ul className="nav-links">
-                    <li><Link to="/tasks">Задачи</Link></li>
+                    <li><Link to="/tasks">Мои задачи</Link></li>
                     <li><Link to="/projects">Проекты</Link></li>
-                    {auth?.user && <li><Link to="/createProject">+ Создать проект</Link></li>}
                     {auth?.user ? (
                         <li className="user-menu">
                             <span className="user-name">Привет, {auth.user.name}!</span>

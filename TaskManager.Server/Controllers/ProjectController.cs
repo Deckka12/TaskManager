@@ -2,6 +2,8 @@
 using System.Security.Claims;
 using TaskManager.Application.DTOs;
 using TaskManager.Application.Interfaces;
+using TaskManager.Application.Services;
+using TaskManager.Domain.Interface;
 
 namespace TaskManager.Server.Controllers
 {
@@ -11,9 +13,11 @@ namespace TaskManager.Server.Controllers
     {
 
         private readonly IProjectService _projectService;
-        public ProjectController(IProjectService projectService)
+        private readonly ITaskService _taskService;
+        public ProjectController(IProjectService projectService, ITaskService taskService)
         {
             _projectService = projectService;
+            _taskService = taskService;
         }
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] ProjectDTO projectDto)
@@ -38,6 +42,29 @@ namespace TaskManager.Server.Controllers
             {
                 return StatusCode(500, new { message = "Ошибка сервера", error = ex.ToString() });
             }
+        }
+
+        /// <summary>
+        /// Получить проект по ID
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProjectById(Guid id)
+        {
+            var project = await _projectService.GetProjectByIdAsync(id);
+            if (project == null)
+                return NotFound();
+
+            return Ok(project);
+        }
+
+        /// <summary>
+        /// Получить задачи по ID проекта
+        /// </summary>
+        [HttpGet("projectID/{id}")]
+        public async Task<IActionResult> GetTasksByProjectId(Guid id)
+        {
+            var tasks = await _taskService.GetTasksByProjectIdAsync(id);
+            return Ok(tasks);
         }
 
         [HttpGet("project")]

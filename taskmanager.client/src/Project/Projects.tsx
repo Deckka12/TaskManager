@@ -3,6 +3,8 @@ import axios from 'axios';
 import './Projects.css'; // Подключаем CSS
 import { AuthContext } from "../context/AuthContext";
 import CreateProject from "./CreateProject";
+import { useNavigate } from 'react-router-dom';
+
 
 interface ProjectUserRole {
     userId: string;
@@ -28,6 +30,8 @@ const Projects: React.FC = () => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [createProject, getCreateProject] = useState<boolean>(false);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         // Загружаем проекты

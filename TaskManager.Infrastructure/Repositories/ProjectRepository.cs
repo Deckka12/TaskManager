@@ -22,18 +22,22 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
             return await _context.Projects
-                .Include(p => p.ProjectUserRoles)                // Загружаем роли проекта
-                    .ThenInclude(pur => pur.User)                // И пользователей этих ролей
-                .Include(p => p.ProjectUserRoles)                // Можно также повторить для читаемости
-                    .ThenInclude(pur => pur.Role)                // И названия самих ролей
-                .Include(p => p.Owner)                           // Владелец проекта
+                .Include(p => p.ProjectUserRoles)                
+                    .ThenInclude(pur => pur.User)                
+                .Include(p => p.ProjectUserRoles)                
+                    .ThenInclude(pur => pur.Role)                
+                .Include(p => p.Owner)                           
                 .ToListAsync();
         }
 
 
         public async Task<Project?> GetProjectByIdAsync(Guid id)
         {
-            return await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Projects.Include(p => p.ProjectUserRoles)                
+                    .ThenInclude(pur => pur.User)                
+                .Include(p => p.ProjectUserRoles)                
+                    .ThenInclude(pur => pur.Role)                
+                .Include(p => p.Owner).FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }
