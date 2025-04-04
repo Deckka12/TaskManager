@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TaskManager.Domain.Entities;
 using TaskManager.Application.Interface;
 using TaskManager.Domain.Interface;
+using TaskManager.Application.DTOs;
 
 namespace TaskManager.Application.Services
 {
@@ -18,15 +19,15 @@ namespace TaskManager.Application.Services
             _workLogRepository = workLogRepository;
         }
 
-        public async Task AddWorkLogAsync(Guid taskId, Guid userId, double hours, string workType, string comment)
+        public async Task AddWorkLogAsync(WorkLogDto workLogDto)
         {
             var workLog = new WorkLog
             {
-                TaskId = taskId,
-                UserId = userId,
-                HoursSpent = hours,
-                WorkType = workType,
-                Comment = comment,
+                TaskId = workLogDto.TaskId,
+                UserId = workLogDto.UserId,
+                HoursSpent = workLogDto.HoursSpent,
+                WorkType = workLogDto.WorkType,
+                Comment = workLogDto.Comment,
                 Date = DateTime.UtcNow
             };
 

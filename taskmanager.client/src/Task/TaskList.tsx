@@ -6,7 +6,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import './TaskList.css';
 import { AuthContext } from '../context/AuthContext';
-import TaskDetails from './TaskDetails';
+import TaskDetails from './TaskDetails/TaskDetails';
 import CreateTask from './CreateTask';
 import EditTask from './EditTask';
 import API_BASE_URL from '../config';

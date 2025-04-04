@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TaskManager.Application.DTOs;
+using TaskManager.Application.Interface;
 using TaskManager.Application.Interfaces;
 using TaskManager.Application.Services;
 using TaskManager.Domain.Entities;
@@ -19,16 +20,19 @@ namespace TaskManager.Server.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITaskService _taskService;
+        private readonly IWorkLogService _workLogService;
         private readonly IProjectService _projectService;
         private readonly IDistributedCache _cache;
         private readonly ILogger<TaskController> _logger;
-        public TaskController(ITaskService taskService, IProjectService projectService, IUserService userService, IDistributedCache cache, ILogger<TaskController> logger) 
+        public TaskController(ITaskService taskService, IProjectService projectService, IUserService userService
+            , IDistributedCache cache, ILogger<TaskController> logger, IWorkLogService workLogService) 
         {
             _projectService = projectService;
             _userService = userService;
             _taskService = taskService;
             _cache = cache;
             _logger = logger;
+            _workLogService = workLogService;
         }
 
         /// <summary>
@@ -112,7 +116,7 @@ namespace TaskManager.Server.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<TaskItem>>> GetTaskById(Guid id)
+        public async Task<ActionResult<IEnumerable<TaskDtos>>> GetTaskById(Guid id)
         {
             var task =  _taskService.GetAllTasks().Result.FirstOrDefault(x => x.Id == id);
             if (task == null)
@@ -175,6 +179,13 @@ namespace TaskManager.Server.Controllers
             {
                 return StatusCode(500, new { message = "Ошибка сервера", error = ex.Message });
             }
+        }
+
+        [HttpPost("worklog")]
+        public async Task<IActionResult> AddWorkLog([FromBody] WorkLogDto dto)
+        {
+            await _workLogService.AddWorkLogAsync(dto);
+            return Ok();
         }
 
         /// <summary>

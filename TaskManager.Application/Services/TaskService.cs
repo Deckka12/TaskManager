@@ -126,6 +126,7 @@ namespace TaskManager.Application.Services
                 PerformerId = t.PerformerID,
                 DueDate = t.DueDate,
                 CategoryId = t.CategotyID
+               
             }).ToList();
         }
 
@@ -145,7 +146,18 @@ namespace TaskManager.Application.Services
                 ProjectId = t.ProjectId,
                 PerformerId = t.PerformerID,
                 DueDate = t.DueDate,
-                CategoryId = t.CategotyID
+                CategoryId = t.CategotyID,
+                workLogs = t.WorkLogs.Select(log => new WorkLogDto
+                {
+                    TaskId = log.TaskId,
+                    UserId = log.UserId ?? Guid.Empty,
+                    UserName = log.User?.Name ?? "—", // <- здесь!
+                    HoursSpent = log.HoursSpent,
+                    WorkType = log.WorkType,
+                    Comment = log.Comment,
+                    Date = log.Date
+
+                }).ToList()
             }).ToList();
         }
 

@@ -30,7 +30,7 @@ namespace TaskManager.Application.DTOs
         public Guid? CategoryId { get; set; }  // ✅ Добавлено
         public DateTime? DueDate { get; set; }  // ✅ Добавлено
 
-        public List<WorkLog>? workLogs { get; set; }
+        public List<WorkLogDto>? workLogs { get; set; }
 
     }
 }

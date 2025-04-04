@@ -21,7 +21,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IEnumerable<TaskItem>> GetByUserIdAsync(Guid userId)
         {
-            return await _context.Tasks.Include(t => t.Project).Include(x => x.User).Where(t => t.UserId == userId).ToListAsync();
+            return await _context.Tasks.Include(t => t.Project).Include(x => x.User).Include(x => x.WorkLogs).Where(t => t.UserId == userId).ToListAsync();
         }
 
         public async Task DeleteAsync(Guid id)
@@ -43,7 +43,11 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IEnumerable<TaskItem>> GetByAllTask()
         {
             return await _context.Tasks
-               .Include(t => t.Project).Include(x => x.User).ToListAsync();
+               .Include(t => t.Project)
+               .Include(x => x.User)
+               .Include(x=> x.WorkLogs)
+                .ThenInclude(w => w.User)
+               .ToListAsync();
                
         }
 
