@@ -12,5 +12,11 @@ namespace TaskManager.Domain.Interface
     {
         Task<User?> GetUserByEmailAsync(string email);
         Task AddUserAsync(User user);
+        Task<User?> GetUserByEmailWithRolesAsync(string email);
+        Task<IEnumerable<User>> GetByAllUser();
+        Task<IEnumerable<Role>> GetByAllRole();
+        Task<bool> UpdateUserWithRolesAsync(Guid userId, string name, string email, List<string> roleNames);
+
+
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.DBContext;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.DBContext;
 namespace TaskManager.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250405093558_addUserRole")]
+    partial class addUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,23 +139,6 @@ namespace TaskManager.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("eeed3e2b-c6f3-4d2b-b208-496b747160f9"),
-                            Name = "admin"
-                        },
-                        new
-                        {
-                            Id = new Guid("57050ced-8aaf-4cd2-9fad-4fe44cb50985"),
-                            Name = "user"
-                        },
-                        new
-                        {
-                            Id = new Guid("26a0356b-4055-4612-93c6-f0c69d116e97"),
-                            Name = "moderator"
-                        });
                 });
 
             modelBuilder.Entity("TaskManager.Domain.Entities.TaskFile", b =>

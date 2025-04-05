@@ -22,12 +22,29 @@ namespace TaskManager.Infrastructure.DBContext
         public DbSet<Category> Category { get; set; }
         public DbSet<ProjectUserRole> ProjectUserRole { get; set; }
         public DbSet<ProjectRole> ProjectRoles { get; set; }
+        public DbSet<UserRole> UserRole { get; set; }
+        public DbSet<Role> Role { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ProjectUserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new UserlRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+
+            modelBuilder.Entity<UserRole>()
+.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(ur => ur.UserId);
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId);
 
             modelBuilder.Entity<TaskItem>()
                 .HasOne(t => t.User)
@@ -76,6 +93,8 @@ namespace TaskManager.Infrastructure.DBContext
                 .WithMany(u => u.WorkLogs)
                 .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            
 
             base.OnModelCreating(modelBuilder);
         }

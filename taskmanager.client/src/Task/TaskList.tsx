@@ -15,7 +15,7 @@ import viewIcon from '../Icons/view.png';
 import editIcon from '../Icons/Edit.png';
 import deleteIcon from '../Icons/Delete.png';
 
-import log from 'loglevel';
+
 
 interface TaskItem {
     id: string;
@@ -75,7 +75,6 @@ const TaskList: React.FC = () => {
                 setTasks(response.data);
                 setFilteredTasks(response.data);
                 setLoading(false);
-                log.info("Задачи загружены");
             })
             .catch(error => {
                 console.error('Ошибка при загрузке задач:', error);

@@ -8,6 +8,16 @@ interface User {
     name: string;
     email: string;
     exp: number;
+    roles: string[];
+}
+
+interface JwtPayload {
+    sub: string;
+    name: string;
+    email: string;
+    exp: number;
+    role?: string | string[];
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string | string[];
 }
 
 interface AuthContextType {
@@ -26,21 +36,26 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     useEffect(() => {
         if (token) {
             try {
-                const decoded: any = jwtDecode(token);
-                console.log("Декодированный JWT:", decoded); // Добавляем логирование
+                const decoded = jwtDecode<JwtPayload>(token);
 
-                if (decoded && decoded.sub && decoded.name && decoded.email) {
-                    setUser({
-                        id: decoded.sub,
-                        name: decoded.name,
-                        email: decoded.email,
-                        exp: decoded.exp
-                    });
-                } else {
-                    console.error("Ошибка декодирования JWT: не хватает данных", decoded);
-                    setToken(null);
-                    setUser(null);
+                let roles: string[] = [];
+
+                if (Array.isArray(decoded.role)) {
+                    roles = decoded.role;
+                } else if (typeof decoded.role === "string") {
+                    roles = [decoded.role];
+                } else if (decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]) {
+                    const raw = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                    roles = Array.isArray(raw) ? raw : [raw];
                 }
+
+                setUser({
+                    id: decoded.sub,
+                    name: decoded.name,
+                    email: decoded.email,
+                    exp: decoded.exp,
+                    roles,
+                });
             } catch (error) {
                 console.error("Ошибка декодирования JWT:", error);
                 setToken(null);
@@ -48,7 +63,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             }
         }
     }, [token]);
-
 
     const login = async (email: string, password: string) => {
         try {

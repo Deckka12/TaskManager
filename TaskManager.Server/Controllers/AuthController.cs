@@ -7,10 +7,10 @@ using TaskManager.Application.Interfaces;
 using TaskManager.Domain.Entities;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using TaskManager.Domain.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace TaskManager.Server.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -27,14 +27,29 @@ namespace TaskManager.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _userRepository.GetUserByEmailAsync(model.Email);
+            var user = await _userRepository
+                .GetUserByEmailWithRolesAsync(model.Email); // теперь с ролями
+
             if (user == null || !VerifyPassword(model.Password, user.PasswordHash))
             {
                 return Unauthorized(new { message = "Неверный email или пароль" });
             }
 
             var token = GenerateJwtToken(user);
-            return Ok(new { token, user = new { user.Id, user.Name, user.Email } });
+
+            var roles = user.UserRoles?.Select(ur => ur.Role.Name).ToList();
+
+            return Ok(new
+            {
+                token,
+                user = new
+                {
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    Roles = roles
+                }
+            });
         }
 
         [HttpPost("register")]
@@ -48,13 +63,22 @@ namespace TaskManager.Server.Controllers
             {
                 return BadRequest(new { message = "Пользователь уже существует" });
             }
+            var userRole = await _userRepository.GetByAllRole();
 
             var newUser = new User
             {
                 Name = model.Name,
                 Email = model.Email,
                 PasswordHash = HashPassword(model.Password),
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UserRoles = new List<UserRole>
+                {
+                    new UserRole
+                    {
+                        Role = userRole.FirstOrDefault(x => x.Name.Equals("User", StringComparison.OrdinalIgnoreCase)),
+                        User = existingUser
+                    }
+                }
             };
 
             await _userRepository.AddUserAsync(newUser);
@@ -64,11 +88,20 @@ namespace TaskManager.Server.Controllers
         private string GenerateJwtToken(User user)
         {
             var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // <-- ВАЖНО
-        new Claim(JwtRegisteredClaimNames.Email, user.Email),
-        new Claim("name", user.Name)
-    };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("name", user.Name)
+            };
+
+            // Добавляем все роли
+            if (user.UserRoles != null)
+            {
+                foreach (var role in user.UserRoles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role.Role.Name));
+                }
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -83,7 +116,6 @@ namespace TaskManager.Server.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
 
         private string HashPassword(string password)
         {

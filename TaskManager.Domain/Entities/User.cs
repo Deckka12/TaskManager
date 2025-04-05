@@ -14,10 +14,11 @@ namespace TaskManager.Domain.Entities
         public string PasswordHash { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? TelegramId { get; set; }
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 
         public ICollection<Project> Projects { get; set; } = new List<Project>();
-        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>(); 
-        public ICollection<WorkLog> WorkLogs { get; set; } = new List<WorkLog>(); 
+        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
+        public ICollection<WorkLog> WorkLogs { get; set; } = new List<WorkLog>();
         public ICollection<TaskFile> TaskFiles { get; set; } = new List<TaskFile>();
         public ICollection<ProjectUserRole> ProjectUserRoles { get; set; }
     }

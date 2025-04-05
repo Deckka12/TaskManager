@@ -51,9 +51,15 @@ const Header: React.FC = () => {
                                 <span className="user-name">Привет, {auth.user.name}!</span>
                                 <Link to="/profile">Профиль</Link>
                                 <Link to="/settings">Настройки</Link>
+
+                                {auth.user.roles.includes("admin") && (
+                                    <Link to="/admin">Админ-панель</Link>
+                                )}
+
                                 <button className="logout-button" onClick={auth.logout}>Выйти</button>
                             </div>
                         )}
+
                     </div>
                 ) : (
                     <div className="auth-links">
