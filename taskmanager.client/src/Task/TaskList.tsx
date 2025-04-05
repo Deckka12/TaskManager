@@ -29,8 +29,17 @@ interface TaskItem {
     userId: string;
     categoryID: string;
     dueDate: Date;
+    workLogs: TimeEntry[];
 }
-
+export interface TimeEntry {
+    id: string;
+    userId?: string;
+    userName?: string;
+    date: Date;
+    hoursSpent: number;
+    workType: string;
+    comment?: string;
+}
 interface User {
     id: string;
     name: string;
@@ -171,6 +180,7 @@ const TaskList: React.FC = () => {
                                 <p className="hidetext">{task.description}</p>
                                 <p><strong>Статус:</strong> {getStatusText(task.status)}</p>
                                 <p><strong>Приоритет:</strong> {getPriorityText(task.priority)}</p>
+                            {/*    <p><strong>Приоритет:</strong> {task.workLogs.}</p>*/}
                                 <div className="buttonImg">
                                     <div className="images"><img onClick={() => openTaskDetailss(task.id)} src={viewIcon} alt="Просмотр" /></div>
                                     <div className="images"><img src={editIcon} onClick={() => openTaskEdit(task)} alt="Редактировать" /></div>
