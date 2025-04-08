@@ -34,7 +34,7 @@ namespace TaskManager.Infrastructure.DBContext
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
 
             modelBuilder.Entity<UserRole>()
-.HasKey(ur => new { ur.UserId, ur.RoleId });
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
 
             modelBuilder.Entity<UserRole>()
                 .HasOne(ur => ur.User)
