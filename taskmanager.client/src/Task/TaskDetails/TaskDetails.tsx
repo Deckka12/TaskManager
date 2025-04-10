@@ -22,7 +22,9 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
     const [files, setFiles] = useState<FileItem[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [hoursSpent, setHoursSpent] = useState(0);
-    const [workType, setWorkType] = useState('');
+
+    const [workTypeId, setWorkTypeId] = useState<string>("");
+
     const [comment, setComment] = useState('');
     const [activeTab, setActiveTab] = useState<'info' | 'files' | 'worklog' | 'comments'>('info');
 
@@ -55,22 +57,22 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
                 userId: auth.user.id,
                 userName: auth.user.name,
                 hoursSpent,
-                workType,
+                workTypeId,
                 comment,
             };
-
+            console.log("Отправка worklog", requestBody);
             await addWorkLog(requestBody, auth.token); // тут тип any подходит
             const res = await fetchTaskDetails(taskId, auth.token);
             setTask(res.data);
 
             setModalOpen(false);
             setHoursSpent(0);
-            setWorkType('');
             setComment('');
         } catch (error) {
             console.error('Ошибка при списании времени:', error);
         }
     };
+
 
 
     if (!task) return <div>Загрузка...</div>;
@@ -110,7 +112,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
                     {activeTab === 'comments' && (
                         <>
                             <h3>Комментарии</h3>
-                            <CommentsStub />
+                            <CommentsStub taskId={task.id} />
                         </>
                     )}
                 </div>
@@ -122,8 +124,8 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onClose }) => {
                 onSave={handleAddWorkLog}
                 hoursSpent={hoursSpent}
                 setHoursSpent={setHoursSpent}
-                workType={workType}
-                setWorkType={setWorkType}
+                workTypeId={workTypeId}
+                setWorkTypeId={setWorkTypeId}
                 comment={comment}
                 setComment={setComment}
             />

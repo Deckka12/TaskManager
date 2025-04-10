@@ -13,14 +13,18 @@ export interface FileItem {
     id: number;
     fileName: string;
 }
+export interface WorkType {
+    id: string;
+    name: string;
+}
 
 export interface TimeEntry {
     id: string;
     userId?: string;
     userName?: string;
-    date: Date;
+    date: string;
     hoursSpent: number;
-    workType: string;
+    workType: WorkType; // <-- גלוסעמ string
     comment?: string;
 }
 
@@ -29,6 +33,15 @@ export interface WorkLogInput {
     userId: string;
     userName: string;
     hoursSpent: number;
-    workType: string;
+    workTypeId: string;
     comment: string;
+}
+
+export interface CommentDto {
+    id: string;
+    taskId: string;
+    userId: string;
+    userName: string;
+    text: string;
+    createdAt: string;
 }

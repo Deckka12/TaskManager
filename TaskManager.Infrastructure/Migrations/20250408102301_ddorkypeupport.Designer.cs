@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.DBContext;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.DBContext;
 namespace TaskManager.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250408102301_ddorkypeupport")]
+    partial class ddorkypeupport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -311,8 +314,9 @@ namespace TaskManager.Infrastructure.Migrations
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("WorkTypeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("WorkType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -320,24 +324,7 @@ namespace TaskManager.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("WorkTypeId");
-
                     b.ToTable("WorkLogs");
-                });
-
-            modelBuilder.Entity("TaskManager.Domain.Entities.WorkType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WorkType");
                 });
 
             modelBuilder.Entity("TaskManager.Domain.Entities.Comment", b =>
@@ -476,17 +463,9 @@ namespace TaskManager.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("TaskManager.Domain.Entities.WorkType", "WorkType")
-                        .WithMany("WorkLogs")
-                        .HasForeignKey("WorkTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Task");
 
                     b.Navigation("User");
-
-                    b.Navigation("WorkType");
                 });
 
             modelBuilder.Entity("TaskManager.Domain.Entities.Category", b =>
@@ -530,11 +509,6 @@ namespace TaskManager.Infrastructure.Migrations
 
                     b.Navigation("UserRoles");
 
-                    b.Navigation("WorkLogs");
-                });
-
-            modelBuilder.Entity("TaskManager.Domain.Entities.WorkType", b =>
-                {
                     b.Navigation("WorkLogs");
                 });
 #pragma warning restore 612, 618

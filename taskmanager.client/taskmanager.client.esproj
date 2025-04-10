@@ -11,4 +11,10 @@
   <ItemGroup>
     <Folder Include="src\Icons\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.dockerignore">
+      <DependentUpon>$(DockerDefaultDockerfile)</DependentUpon>
+      <Link>.dockerignore</Link>
+    </None>
+  </ItemGroup>
 </Project>

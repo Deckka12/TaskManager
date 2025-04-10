@@ -20,6 +20,15 @@
   </ItemGroup>
 
   <ItemGroup>
+     <None Update="appsettings.json">
+    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+  </None>
+  <None Update="appsettings.Development.json">
+    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+  </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
       <PrivateAssets>all</PrivateAssets>

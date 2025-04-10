@@ -9,9 +9,9 @@ interface Props {
 
 const TimeModal: React.FC<Props> = ({ open, onClose, onSave }) => {
     const [entry, setEntry] = useState<Omit<TimeEntry, 'id'>>({
-        date: new Date(),
+        date: new Date().toISOString(), // строка вместо объекта Date
         hoursSpent: 0,
-        workType: '',
+        workType: { id: '', name: '' }, // WorkType, а не строка
         comment: ''
     });
 
@@ -36,8 +36,8 @@ const TimeModal: React.FC<Props> = ({ open, onClose, onSave }) => {
                 />
                 <input
                     type="text"
-                    value={entry.workType}
-                    onChange={e => setEntry({ ...entry, workType: e.target.value })}
+                    value={entry.workType.id}
+                    onChange={e => setEntry({ ...entry, workType: { ...entry.workType, id: e.target.value } })}
                     placeholder="Тип работ"
                 />
                 <textarea

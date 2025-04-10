@@ -4,6 +4,7 @@ import './Projects.css'; // Подключаем CSS
 import { AuthContext } from "../context/AuthContext";
 import CreateProject from "./CreateProject";
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from "../config";
 
 
 interface ProjectUserRole {
@@ -22,7 +23,6 @@ interface Project {
     userRoles: ProjectUserRole[];
 }
 
-const API_BASE_URL = "http://localhost:5213";
 
 const Projects: React.FC = () => {
     const auth = useContext(AuthContext);

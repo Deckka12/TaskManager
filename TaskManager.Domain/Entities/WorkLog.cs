@@ -13,7 +13,8 @@ namespace TaskManager.Domain.Entities
         public Guid? UserId { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;
         public double HoursSpent { get; set; }
-        public string WorkType { get; set; }
+        public Guid WorkTypeId { get; set; }
+        public WorkType WorkType { get; set; }
         public string? Comment { get; set; }
 
         public TaskItem? Task { get; set; }

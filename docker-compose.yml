@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: taskmanager-api
+    build:
+      context: .
+      dockerfile: TaskManager.Server/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=TaskDb;User Id=admin;Password=123qwe;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=localhost:6379
+
+  client:
+    container_name: taskmanager-client
+    build:
+      context: ./taskmanager.client
+      dockerfile: Dockerfile
+    environment:
+      - DOCKER=true
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true

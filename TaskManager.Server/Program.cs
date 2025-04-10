@@ -14,7 +14,6 @@ using Serilog;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -42,6 +41,12 @@ builder.Services.AddScoped<ITaskFileRepository, TaskFileRepository>();
 builder.Services.AddScoped<ITaskFileService, TaskFileService>();
 builder.Services.AddScoped<IProjectRoleService, ProjectRoleService>();
 builder.Services.AddScoped<IProjectRoleRepository, ProjectRoleRepository>();
+builder.Services.AddScoped<IWorkTypeRepository, WorkTypeRepository>();
+builder.Services.AddScoped<IWorkTypeService, WorkTypeService>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+
+
 builder.Services.AddSingleton<TelegramService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

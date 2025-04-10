@@ -46,7 +46,9 @@ namespace TaskManager.Infrastructure.Repositories
                .Include(t => t.Project)
                .Include(x => x.User)
                .Include(x=> x.WorkLogs)
-                .ThenInclude(w => w.User)
+                .ThenInclude(w => w.WorkType)
+               .Include(x => x.WorkLogs)
+                .ThenInclude(x => x.User)
                .ToListAsync();
                
         }

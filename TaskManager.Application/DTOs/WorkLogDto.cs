@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManager.Domain.Entities;
 
 namespace TaskManager.Application.DTOs
 {
@@ -12,7 +13,7 @@ namespace TaskManager.Application.DTOs
         public Guid UserId { get; set; }
         public string UserName { get; set; }
         public double HoursSpent { get; set; }
-        public string WorkType { get; set; }
+        public WorkType WorkType { get; set; }
         public string? Comment { get; set; }
         public DateTime? Date { get; set; }
     }
