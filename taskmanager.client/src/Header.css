@@ -80,3 +80,61 @@
     .profile-dropdown a:hover {
         background-color: #f0f0f0;
     }
+
+.notifications-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 60px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    width: 20%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    max-height: 80%;
+    overflow: auto;
+    padding: 20px;
+}
+
+.notification-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+
+}
+
+    .notification-item.unread {
+        background-color: #f0f8ff;
+        font-weight: bold;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+.empty {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}
+
+.notification-btn {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}

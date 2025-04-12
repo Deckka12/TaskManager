@@ -90,6 +90,7 @@ namespace TaskManager.Server.Controllers
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // ← добавь ЭТО
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("name", user.Name)
             };

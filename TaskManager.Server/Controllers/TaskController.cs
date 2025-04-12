@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
@@ -11,6 +12,7 @@ using TaskManager.Application.Interface;
 using TaskManager.Application.Interfaces;
 using TaskManager.Application.Services;
 using TaskManager.Domain.Entities;
+using TaskManager.Domain.Interface;
 
 namespace TaskManager.Server.Controllers
 {
@@ -24,8 +26,16 @@ namespace TaskManager.Server.Controllers
         private readonly IProjectService _projectService;
         private readonly IDistributedCache _cache;
         private readonly ILogger<TaskController> _logger;
+        private readonly INotificationService _notificationService;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly KafkaProducer _kafkaProducer;
+
         public TaskController(ITaskService taskService, IProjectService projectService, IUserService userService
-            , IDistributedCache cache, ILogger<TaskController> logger, IWorkLogService workLogService) 
+            , IDistributedCache cache, ILogger<TaskController> logger, IWorkLogService workLogService, INotificationService notificationService
+            , INotificationRepository notificationRepository
+            , IHubContext<NotificationHub> hubContext
+            , KafkaProducer kafkaProducer) 
         {
             _projectService = projectService;
             _userService = userService;
@@ -33,6 +43,10 @@ namespace TaskManager.Server.Controllers
             _cache = cache;
             _logger = logger;
             _workLogService = workLogService;
+            _notificationService = notificationService;
+            _notificationRepository = notificationRepository;
+            _hubContext = hubContext;
+            _kafkaProducer = kafkaProducer;
         }
 
         /// <summary>
@@ -171,8 +185,23 @@ namespace TaskManager.Server.Controllers
             try
             {
                 await _taskService.CreateTaskAsync(taskDto);
-                await _cache.RemoveAsync("all_tasks");
+
                 _logger.LogInformation($"/api/task/create: Задача успешно создана пользователем {user.Name}");
+                var notification = new Notification
+                {
+                    UserId = taskDto.PerformerId, // кому назначена задача
+                    Message = $"🆕 Новая задача: {taskDto.Title}"
+                };
+
+                // SignalR
+                var connId = NotificationHub.GetConnectionId(taskDto.PerformerId);
+                if (connId != null)
+                {
+                    await _kafkaProducer.SendNotificationAsync(notification);
+                    await _hubContext.Clients.Client(connId).SendAsync("ReceiveNotification", notification.Message);
+                    await _notificationRepository.AddAsync(notification);
+
+                }
                 return Ok(new { message = "Задача успешно создана!" });
             }
             catch (Exception ex)

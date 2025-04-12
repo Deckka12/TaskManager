@@ -3,6 +3,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import API_BASE_URL from "../config";
 
+
 interface User {
     id: string;
     name: string;
@@ -25,6 +26,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     user: User | null;
+    loading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -32,6 +34,8 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
     const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         if (token) {
@@ -62,6 +66,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                 setUser(null);
             }
         }
+        setLoading(false); 
     }, [token]);
 
     const login = async (email: string, password: string) => {
@@ -79,12 +84,15 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         localStorage.removeItem("token");
         setToken(null);
         setUser(null);
+        console.log("pfikb c.lf");
+
     };
 
     return (
-        <AuthContext.Provider value={{ token, login, logout, user }}>
+        <AuthContext.Provider value={{ token, login, logout, user, loading }}>
             {children}
         </AuthContext.Provider>
+
     );
 };
 

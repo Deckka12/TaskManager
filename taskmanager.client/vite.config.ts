@@ -61,17 +61,8 @@ const serverOptions: ServerOptions = {
             target,
             secure: false
         }
-    },
-    ...(isDocker
-        ? {} // не передаём https вообще
-        : {
-            https: {
-                key: fs.readFileSync(keyFilePath),
-                cert: fs.readFileSync(certFilePath)
-            }
-        })
+    }
 };
-
 export default defineConfig({
     plugins: [plugin()],
     resolve: {

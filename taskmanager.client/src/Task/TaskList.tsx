@@ -70,6 +70,7 @@ const TaskList: React.FC = () => {
     const [projects, setProjects] = useState<Project[]>([]);
 
     useEffect(() => {
+        if (!auth?.user?.id) return;
         axios.get<TaskItem[]>(`${API_BASE_URL}/api/task/myTasks/${auth?.user?.id}`)
             .then(response => {
                 setTasks(response.data);
@@ -88,7 +89,7 @@ const TaskList: React.FC = () => {
         axios.get<Project[]>(`${API_BASE_URL}/api/project/project`)
             .then(response => setProjects(response.data))
             .catch(error => console.error('Ошибка при загрузке проектов:', error));
-    }, []);
+    }, [auth?.user?.id]);
 
     useEffect(() => {
         let filtered = tasks;

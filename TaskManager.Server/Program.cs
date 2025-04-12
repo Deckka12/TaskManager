@@ -1,31 +1,33 @@
-using TaskManager.Infrastructure.DBContext;
+ï»¿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
-using TaskManager.Domain.Interface;
-using TaskManager.Infrastructure.Repositories;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using System.Text;
+using TaskManager.Application.Interface;
 using TaskManager.Application.Interfaces;
 using TaskManager.Application.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using TaskManager.Application.Interface;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Serilog;
-using Microsoft.Extensions.Options;
+using TaskManager.Domain.Interface;
+using TaskManager.Infrastructure.DBContext;
+using TaskManager.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
-// Add services to the container.
+
+// 1. Ð‘Ð°Ð·Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.EnableSensitiveDataLogging();
 });
+
+// 2. ÐšÐ¾Ð½Ñ‚Ñ€Ð¾Ð»Ð»ÐµÑ€Ñ‹ + JSON Ñ†Ð¸ÐºÐ»Ñ‹
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
-builder.Services.AddControllersWithViews();
+
+// 3. DI
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
@@ -33,7 +35,6 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IWorkLogRepository, WorkLogRepository>();
 builder.Services.AddScoped<IWorkLogService, WorkLogService>();
@@ -45,44 +46,33 @@ builder.Services.AddScoped<IWorkTypeRepository, WorkTypeRepository>();
 builder.Services.AddScoped<IWorkTypeService, WorkTypeService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<NotificationServices>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<KafkaProducer>();
+builder.Services.AddScoped<KafkaConsumer>();
+builder.Services.AddSingleton<KafkaProducerService>();
 
 
+// 4. SignalR
+builder.Services.AddSignalR();
+
+// 5. Telegram bot
 builder.Services.AddSingleton<TelegramService>();
+
+// 6. ÐÑƒÑ‚ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ñ (Cookie + JWT)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Users/Login"; // Ñòðàíèöà âõîäà
-        options.LogoutPath = "/Users/Logout"; // Ñòðàíèöà âûõîäà
+        options.LoginPath = "/Users/Login";
+        options.LogoutPath = "/Users/Logout";
     });
-
-// ïîäêëþ÷àåì Serilog
-builder.Host.UseSerilog((ctx, lc) =>
-    lc.ReadFrom.Configuration(ctx.Configuration));
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "Task Manager API",
-        Version = "v1"
-    });
-});
-
-
-//builder.WebHost.UseUrls("http://192.168.22.250:5213");
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-});
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false; // Òîëüêî äëÿ ëîêàëüíîé ðàçðàáîòêè
+        options.RequireHttpsMetadata = false;
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -95,36 +85,69 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+
+// 7. ÐšÑÑˆ Redis
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
 });
 
+// 8. ÐÐ²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ð¸Ñ
 builder.Services.AddAuthorization();
 
+// 9. CORS Ð´Ð»Ñ Ñ„Ñ€Ð¾Ð½Ñ‚Ð°
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000") // â† ÑÑ‚Ñ€Ð¾Ð³Ð¾ HTTP, ÐºÐ°Ðº Ñƒ Ñ‚ÐµÐ±Ñ Ð½Ð° Ñ„Ñ€Ð¾Ð½Ñ‚Ðµ
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+// 10. Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Task Manager API",
+        Version = "v1"
+    });
+});
+
+// 11. Serilog
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.ReadFrom.Configuration(ctx.Configuration));
 
 var app = builder.Build();
-// Configure the HTTP request pipeline.
+
+// 12. Swagger UI (Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð² Ð´ÐµÐ²Ðµ)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseDefaultFiles();
-app.MapStaticAssets();
-
+// 13. Pipeline
 
 app.UseRouting();
-app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
+app.UseCors("AllowFrontend"); 
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+//app.UseHttpsRedirection(); 
 
+app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
+
+app.UseDefaultFiles();
+app.MapStaticAssets();
 app.MapFallbackToFile("/index.html");
 
 app.Run();

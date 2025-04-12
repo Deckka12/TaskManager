@@ -41,7 +41,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
             .then(response => setUsers(response.data))
             .catch(error => console.error('Ошибка при загрузке пользователей:', error));
 
-        axios.get<Project[]>(`${API_BASE_URL}/api/task/project`)
+        axios.get<Project[]>(`${API_BASE_URL}/api/project/project`)
             .then(response => setProjects(response.data))
             .catch(error => console.error('Ошибка при загрузке проектов:', error));
 
@@ -77,10 +77,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
         };
 
         try {
-            console.log("Отправка запроса с токеном:", auth?.token);
             const headers = { Authorization: `Bearer ${auth?.token}` };
-            console.log("Заголовки запроса:", headers);
-            console.log("Отправка запроса с токеном:", auth?.token);
             await axios.post(`${API_BASE_URL}/api/task/create`, requestBody, { headers });
             onClose();
             getTask();
