@@ -4,7 +4,10 @@ import axios from "axios";
 import { AuthContext } from "./context/AuthContext";
 import { Bell, UserCircle } from "lucide-react";
 import "./Header.css";
-import API_BASE_URL from "./config"; // обязательно
+import API_BASE_URL from "./config";
+import LoginModal from "./Login/Login"; // путь к файлу
+import RegisterModal from "./Login/Register";
+
 
 interface Notification {
     id: string;
@@ -18,8 +21,13 @@ const Header: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [notifOpen, setNotifOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const menuRef = useRef<HTMLDivElement>(null);
     const [unreadCount, setUnreadCount] = useState<number>(0);
+    const [loginModalOpen, setLoginModalOpen] = useState(false);
+    const [registerModalOpen, setRegisterModalOpen] = useState(false);
+
+
+    const profileMenuRef = useRef<HTMLDivElement>(null);
+    const notificationMenuRef = useRef<HTMLDivElement>(null);
 
     const loadNotifications = async () => {
         if (!auth?.token) return;
@@ -27,7 +35,7 @@ const Header: React.FC = () => {
             const res = await axios.get<Notification[]>(`${API_BASE_URL}/api/notifications/my`, {
                 headers: { Authorization: `Bearer ${auth.token}` }
             });
-            const unread = res.data.filter((n: Notification) => !n.isRead).length;
+            const unread = res.data.filter(n => !n.isRead).length;
             setUnreadCount(unread);
             setNotifications(res.data);
         } catch (e) {
@@ -40,22 +48,22 @@ const Header: React.FC = () => {
             await axios.post(`${API_BASE_URL}/api/notifications/read/${id}`, {}, {
                 headers: { Authorization: `Bearer ${auth?.token}` }
             });
-
             setNotifications(prev => {
                 const updated = prev.map(n => n.id === id ? { ...n, isRead: true } : n);
-                setUnreadCount(updated.filter(n => !n.isRead).length); // ✅ пересчет
+                setUnreadCount(updated.filter(n => !n.isRead).length);
                 return updated;
             });
-
         } catch (e) {
             console.error("Ошибка при отметке уведомления:", e);
         }
     };
 
-
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+            if (
+                profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node) &&
+                notificationMenuRef.current && !notificationMenuRef.current.contains(event.target as Node)
+            ) {
                 setMenuOpen(false);
                 setNotifOpen(false);
             }
@@ -63,17 +71,17 @@ const Header: React.FC = () => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
     useEffect(() => {
         if (!auth?.user?.id || auth.loading) return;
-        loadNotifications(); // ✅ загружаем сразу
+        loadNotifications();
     }, [auth?.user?.id, auth?.loading]);
 
     useEffect(() => {
-        if (!auth?.user?.id) return;
-        if (notifOpen && auth?.user && !auth?.loading) {
+        if (notifOpen && auth?.user?.id && !auth.loading) {
             loadNotifications();
         }
-    }, [notifOpen, auth?.user?.id]);
+    }, [notifOpen]);
 
     return (
         <header className="header">
@@ -90,8 +98,12 @@ const Header: React.FC = () => {
 
             <div className="header-right">
                 {auth?.user && (
-                    <div className="notification-container" ref={menuRef}>
-                        <button className="icon-button  notification-btn" title="Уведомления" onClick={() => setNotifOpen(!notifOpen)}>
+                    <div className="notification-container" ref={notificationMenuRef}>
+                        <button
+                            className="icon-button notification-btn"
+                            title="Уведомления"
+                            onClick={() => setNotifOpen(!notifOpen)}
+                        >
                             <Bell size={20} />
                             {unreadCount > 0 && (
                                 <span className="notification-badge">{unreadCount}</span>
@@ -120,30 +132,45 @@ const Header: React.FC = () => {
                 )}
 
                 {auth?.user ? (
-                    <div className="profile-menu" ref={menuRef}>
-                        <div onClick={() => setMenuOpen(!menuOpen)} className="profile-icon">
+                    <div className="profile-menu" ref={profileMenuRef}>
+                        <div className="profile-icon" onClick={() => setMenuOpen(!menuOpen)}>
                             <UserCircle size={24} />
                         </div>
                         {menuOpen && (
-                            <div className="profile-dropdown">
+                            <div className="profile-dropdown" style={{ zIndex: 999 }}>
                                 <span className="user-name">Привет, {auth.user.name}!</span>
                                 <Link to="/profile">Профиль</Link>
                                 <Link to="/settings">Настройки</Link>
+
                                 {auth.user.roles.includes("admin") && (
                                     <Link to="/admin">Админ-панель</Link>
                                 )}
-                                <button className="logout-button" onClick={auth?.logout}>Выйти</button>
+
+                                <button
+                                    className="logout-button"
+                                    onClick={() => {
+                                        console.log("⛔ Нажата кнопка выхода");
+                                        auth.logout();
+                                    }}
+                                >
+                                    Выйти
+                                </button>
                             </div>
                         )}
                     </div>
                 ) : (
-                    <div className="auth-links">
-                        <Link to="/login" className="nav-link">Войти</Link>
-                        <Link to="/register" className="nav-link">Регистрация</Link>
-                    </div>
+                        <div className="auth-links">
+                            <button className="nav-link" onClick={() => setLoginModalOpen(true)}>Войти</button>
+                            <button className="nav-link" onClick={() => setRegisterModalOpen(true)}>Регистрация</button>
+                        </div>
                 )}
             </div>
+            {loginModalOpen && <LoginModal onClose={() => setLoginModalOpen(false)} />}
+            {registerModalOpen && <RegisterModal onClose={() => setRegisterModalOpen(false)} />}
+
+
         </header>
+
     );
 };
 

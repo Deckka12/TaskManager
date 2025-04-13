@@ -9,6 +9,7 @@ import CommentsStub from './CommentsStub';
 import AddTimeEntities from './AddTimeEntities';
 import CloseIcon from '../../Icons/Delete.png';
 
+
 import './TaskDetails.css';
 
 interface TaskDetailsProps {

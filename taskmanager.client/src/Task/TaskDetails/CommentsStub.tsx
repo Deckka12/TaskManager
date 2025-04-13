@@ -4,6 +4,9 @@ import { fetchComments, addComment } from './api';
 import { CommentDto } from './types';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import MarkdownCommentEditor from "../../MarkdownCommentEditor";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface CommentsProps {
     taskId: string;
@@ -13,6 +16,7 @@ const Comments: React.FC<CommentsProps> = ({ taskId }) => {
     const auth = useContext(AuthContext);
     const [comments, setComments] = useState<CommentDto[]>([]);
     const [text, setText] = useState('');
+    const [preview, setPreview] = useState(false);
 
     const loadComments = async () => {
         try {
@@ -23,7 +27,7 @@ const Comments: React.FC<CommentsProps> = ({ taskId }) => {
         }
     };
 
-    const handleAddComment = async () => {
+    const handleAddComment = async (text: string) => {
         if (!text.trim() || !auth?.token || !auth.user) return;
 
         try {
@@ -33,7 +37,6 @@ const Comments: React.FC<CommentsProps> = ({ taskId }) => {
                 text
             }, auth.token);
 
-            setText('');
             loadComments();
         } catch (error) {
             console.error("Ошибка при добавлении комментария", error);
@@ -45,35 +48,41 @@ const Comments: React.FC<CommentsProps> = ({ taskId }) => {
     }, [taskId]);
 
     return (
-        <div className="comments-section">
-            <div className="comments-list">
-                {comments.map(comment => (
-                    <div key={comment.id} className="comment-item">
-                        <div className="comment-meta">
-                            <strong>{comment.userName}</strong> •{' '}
-                            {formatDistanceToNow(new Date(comment.createdAt), {
-                                addSuffix: true,
-                                locale: ru
-                            })}
+        <>
+            <div className="comments-section">
+                <div className="comments-list">
+                    {comments.map(comment => (
+                        <div key={comment.id} className="comment-item">
+                            <div className="comment-meta">
+                                <strong>{comment.userName}</strong> •{' '}
+                                {formatDistanceToNow(new Date(comment.createdAt), {
+                                    addSuffix: true,
+                                    locale: ru
+                                })}
+                            </div>
+                            <div className="comment-text">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {comment.text.replace(/\n/g, '  \n')}
+                                </ReactMarkdown>
+                            </div>
                         </div>
-                        <div className="comment-text">{comment.text}</div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
-
             {auth?.user && (
                 <div className="comment-form">
-                    <textarea
-                        placeholder="Добавить комментарий..."
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
+                    <MarkdownCommentEditor
+                        text={text}
+                        setText={setText}
+                        preview={preview}
+                        setPreview={setPreview}
                     />
-                    <button className="button primary" onClick={handleAddComment}>
+                    <button className="button primary" onClick={() => handleAddComment(text)} disabled={!text.trim()}>
                         Отправить
                     </button>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

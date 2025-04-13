@@ -1,74 +1,80 @@
 ﻿using Confluent.Kafka;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using TaskManager.Application.Services; // Подключи свой NotificationService
-using Microsoft.AspNetCore.SignalR;
-
 using TaskManager.Application.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using TaskManager.Domain.Entities;
+using TaskManager.Application.DTOs;
 
 public class KafkaNotificationConsumer : BackgroundService
 {
     private readonly ILogger<KafkaNotificationConsumer> _logger;
-    private readonly INotificationService _notificationService;
-    private readonly IHubContext<NotificationHub> _hubContext;
-    private readonly IConfiguration _config;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public KafkaNotificationConsumer(
-        ILogger<KafkaNotificationConsumer> logger,
-        INotificationService notificationService,
-        IHubContext<NotificationHub> hubContext,
-        IConfiguration config)
+    public KafkaNotificationConsumer(ILogger<KafkaNotificationConsumer> logger, IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
-        _notificationService = notificationService;
-        _hubContext = hubContext;
-        _config = config;
+        _scopeFactory = scopeFactory;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var config = new ConsumerConfig
-        {
-            BootstrapServers = _config["Kafka:BootstrapServers"], // например, localhost:9092
-            GroupId = "task-notifications-group",
-            AutoOffsetReset = AutoOffsetReset.Latest
-        };
+        _logger.LogInformation("✅ KafkaNotificationConsumer запущен");
 
-        using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
-        consumer.Subscribe("task-notifications");
-
-        try
+        Task.Run(() =>
         {
+            var config = new ConsumerConfig
+            {
+                BootstrapServers = "localhost:9092",
+                GroupId = "taskmanager-notification-group",
+                AutoOffsetReset = AutoOffsetReset.Earliest
+            };
+
+            using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
+            consumer.Subscribe("notifications");
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                var result = consumer.Consume(stoppingToken);
-                _logger.LogInformation($"📥 Получено сообщение из Kafka: {result.Message.Value}");
-
-                // Десериализуем сообщение
-                var notification = JsonSerializer.Deserialize<NotificationMessage>(result.Message.Value);
-
-                if (notification != null)
+                try
                 {
-                    // 1. Сохраняем в базу
-                    await _notificationService.SaveNotificationAsync(notification.UserId, notification.Message);
+                    var result = consumer.Consume(stoppingToken);
+                    var message = JsonSerializer.Deserialize<NotificationMessage>(result.Message.Value);
 
-                    // 2. Отправляем через SignalR
-                    await _hubContext.Clients.User(notification.UserId.ToString())
-                        .SendAsync("ReceiveNotification", notification.Message);
+                    using var scope = _scopeFactory.CreateScope();
+                    var service = scope.ServiceProvider.GetRequiredService<INotificationService>();
+                    var service1 = scope.ServiceProvider.GetRequiredService<IHubContext<NotificationHub>>();
+                    if (message != null)
+                    {
+                        var connId = NotificationHub.GetConnectionId(new Guid(message.UserId));
+                        service.SaveNotificationAsync(new Guid(message.UserId), message.Message).Wait();
+                        service1.Clients.Client(connId).SendAsync("ReceiveNotification", message.Message);
+                    }
+                         // или `.GetAwaiter().GetResult();`
+                }
+                catch (OperationCanceledException)
+                {
+                    consumer.Close(); // нормальное завершение
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"❌ Kafka Error: {ex.Message}");
                 }
             }
-        }
-        catch (OperationCanceledException)
-        {
-            consumer.Close();
-        }
+
+        }, stoppingToken);
+
+        return Task.CompletedTask;
     }
 
-    public class NotificationMessage
-    {
-        public Guid UserId { get; set; }
-        public string Message { get; set; } = string.Empty;
-    }
+}
+
+public class NotificationMessage
+{
+    public string UserId { get; set; } = default!;
+    public string Message { get; set; } = default!;
 }

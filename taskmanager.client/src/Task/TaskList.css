@@ -532,3 +532,19 @@ strong {
 }
 
 
+.input-error {
+    border: 1px solid #dc2626;
+    background-color: #fef2f2;
+}
+
+.field-error {
+    color: #ff0000;
+    font-size: 13px;
+    margin: 4px 0 4px 0;
+}
+
+.editor-error .comment-editor {
+    border: 1px solid #dc2626;
+    background-color: #fef2f2;
+    border-radius: 6px;
+}

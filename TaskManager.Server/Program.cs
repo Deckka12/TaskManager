@@ -53,6 +53,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<KafkaProducer>();
 builder.Services.AddScoped<KafkaConsumer>();
 builder.Services.AddSingleton<KafkaProducerService>();
+builder.Services.AddHostedService<KafkaNotificationConsumer>();
+
 
 
 // 4. SignalR

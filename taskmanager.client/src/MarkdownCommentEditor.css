@@ -1,0 +1,54 @@
+.comment-editor textarea {
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    font-family: monospace;
+    resize: vertical;
+}
+
+.preview-area {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    min-height: 120px;
+}
+
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 6px 8px;
+    flex-wrap: wrap;
+}
+
+    .editor-toolbar button {
+        all: unset;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 4px 6px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+        .editor-toolbar button:hover {
+            background-color: #e5e7eb;
+        }
+
+        .editor-toolbar button:active {
+            transform: scale(0.96);
+            background-color: #d1d5db;
+        }
+
+        .editor-toolbar button.preview-active {
+            font-weight: bold;
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+textarea{
+    max-width: 49vh;
+}

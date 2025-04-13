@@ -198,8 +198,8 @@ namespace TaskManager.Server.Controllers
                 if (connId != null)
                 {
                     await _kafkaProducer.SendNotificationAsync(notification);
-                    await _hubContext.Clients.Client(connId).SendAsync("ReceiveNotification", notification.Message);
-                    await _notificationRepository.AddAsync(notification);
+                    //await _hubContext.Clients.Client(connId).SendAsync("ReceiveNotification", notification.Message);
+                    //await _notificationRepository.AddAsync(notification);
 
                 }
                 return Ok(new { message = "Задача успешно создана!" });

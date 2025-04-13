@@ -2,6 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import API_BASE_URL from "../config";
+import MarkdownCommentEditor from "../MarkdownCommentEditor";
+import "./TaskList.css"; // убедись, что стили подключены
+
 interface User {
     id: string;
     name: string;
@@ -27,6 +30,14 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
     const auth = useContext(AuthContext);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [preview, setPreview] = useState(false);
+    const [errors, setErrors] = useState<{
+        title?: string;
+        description?: string;
+        projectId?: string;
+        categoryId?: string;
+    }>({});
+
     const [priority, setPriority] = useState("Medium");
     const [projectId, setProjectId] = useState("");
     const [categoryId, setCategoryId] = useState("");
@@ -51,15 +62,19 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
     }, []);
 
     const handleCreateTask = async () => {
-        if (!title.trim() || !description.trim() || !projectId) {
-           
-            return;
-        }
+        const newErrors: typeof errors = {};
 
-        if (!auth?.user?.id) {
-           
-            return;
-        }
+        if (!title.trim()) newErrors.title = "Название задачи обязательно";
+        else if (title.length > 100) newErrors.title = "Название не может превышать 100 символов";
+
+        if (!description.trim()) newErrors.description = "Описание обязательно";
+        if (!projectId) newErrors.projectId = "Проект обязателен";
+        if (!categoryId) newErrors.categoryId = "Категория обязательна";
+
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) return;
+
+        if (!auth?.user?.id) return;
 
         const statusEnum = 0;
         const priorityEnum = priority === "Low" ? 0 : priority === "Medium" ? 1 : 2;
@@ -81,14 +96,12 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
             await axios.post(`${API_BASE_URL}/api/task/create`, requestBody, { headers });
             onClose();
             getTask();
-            
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.error("Ошибка Axiosв:", error.response?.data || error.message);
+                console.error("Ошибка Axios:", error.response?.data || error.message);
             } else {
                 console.error("Неизвестная ошибка:", error);
             }
-           
         }
     };
 
@@ -98,25 +111,31 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
                 <div className="create-task-container">
                     <h2>Создать задачу</h2>
 
-                    {/* Поле Названия */}
+                    {/* Название */}
                     <div className="input-group">
                         <label>Название задачи</label>
+                        {errors.title && <div className="field-error">{errors.title}</div>}
                         <input
                             type="text"
+                            className={errors.title ? "input-error" : ""}
                             placeholder="Введите название"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
                     </div>
 
-                    {/* Поле Описания */}
+                    {/* Описание */}
                     <div className="input-group">
                         <label>Описание</label>
-                        <textarea
-                            placeholder="Введите описание"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
+                        {errors.description && <div className="field-error">{errors.description}</div>}
+                        <div className={errors.description ? "editor-error" : ""}>
+                            <MarkdownCommentEditor
+                                text={description}
+                                setText={setDescription}
+                                preview={preview}
+                                setPreview={setPreview}
+                            />
+                        </div>
                     </div>
 
                     {/* Группа полей */}
@@ -142,7 +161,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
                         </div>
                     </div>
 
-                    {/* Выбор Исполнителя */}
+                    {/* Исполнитель */}
                     <div className="input-group">
                         <label>Ответственный исполнитель</label>
                         <select value={performerId} onChange={(e) => setPerformerId(e.target.value)}>
@@ -153,10 +172,15 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
                         </select>
                     </div>
 
-                    {/* Выбор Проекта */}
+                    {/* Проект */}
                     <div className="input-group">
                         <label>Проект</label>
-                        <select value={projectId} onChange={(e) => setProjectId(e.target.value)}>
+                        {errors.projectId && <div className="field-error">{errors.projectId}</div>}
+                        <select
+                            value={projectId}
+                            onChange={(e) => setProjectId(e.target.value)}
+                            className={errors.projectId ? "input-error" : ""}
+                        >
                             <option value="">Выберите</option>
                             {projects.map(project => (
                                 <option key={project.id} value={project.id}>{project.name}</option>
@@ -164,10 +188,15 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
                         </select>
                     </div>
 
-                    {/* Выбор Категории */}
+                    {/* Категория */}
                     <div className="input-group">
                         <label>Категория</label>
-                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+                        {errors.categoryId && <div className="field-error">{errors.categoryId}</div>}
+                        <select
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(e.target.value)}
+                            className={errors.categoryId ? "input-error" : ""}
+                        >
                             <option value="">Выберите</option>
                             {categories.map(category => (
                                 <option key={category.id} value={category.id}>{category.name}</option>

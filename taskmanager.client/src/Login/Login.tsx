@@ -1,13 +1,15 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import "./LoginModal.css";
 
-const Login: React.FC = () => {
+interface Props {
+    onClose: () => void;
+}
+
+const LoginModal: React.FC<Props> = ({ onClose }) => {
     const auth = useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate();
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -17,19 +19,22 @@ const Login: React.FC = () => {
 
         if (auth) {
             await auth.login(email, password);
-            navigate("/tasks");
+            onClose();
         }
     };
 
     return (
-        <div>
-            <h2>Вход</h2>
-            <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button onClick={handleLogin}>Войти</button>
-            <p>Нет аккаунта? <Link to="/register">Зарегистрироваться</Link></p>
+        <div className="modal-overlay" >
+            <div className="login-modal" onClick={(e) => e.stopPropagation()}>
+                <button className="close-btn" onClick={onClose}>×</button>
+                <h2>Вход</h2>
+                <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <button onClick={handleLogin}>Войти</button>
+                <p>Нет аккаунта? <a href="/register">Регистрация</a></p>
+            </div>
         </div>
     );
 };
 
-export default Login;
+export default LoginModal;
