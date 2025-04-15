@@ -9,16 +9,19 @@ import type { ServerOptions } from 'vite';
 
 const isDocker = process.env.DOCKER === 'true';
 
-const baseFolder =
-    env.APPDATA !== undefined && env.APPDATA !== ''
-        ? `${env.APPDATA}/ASP.NET/https`
-        : `${env.HOME}/.aspnet/https`;
-
 const certificateName = 'taskmanager.client';
-const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+let certFilePath = '';
+let keyFilePath = '';
 
 if (!isDocker) {
+    const baseFolder =
+        env.APPDATA !== undefined && env.APPDATA !== ''
+            ? `${env.APPDATA}/ASP.NET/https`
+            : `${env.HOME}/.aspnet/https`;
+
+    certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+    keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+
     if (!fs.existsSync(baseFolder)) {
         fs.mkdirSync(baseFolder, { recursive: true });
     }
@@ -52,17 +55,24 @@ const target =
             ? env.ASPNETCORE_URLS.split(';')[0]
             : 'https://localhost:7121';
 
-
 const serverOptions: ServerOptions = {
     host: true,
     port: 3000,
     proxy: {
-        '^/weatherforecast': {
+        '^/api': {
             target,
+            changeOrigin: true,
             secure: false
         }
-    }
+    },
+    ...(isDocker ? {} : {
+        https: {
+            key: fs.readFileSync(keyFilePath),
+            cert: fs.readFileSync(certFilePath)
+        }
+    })
 };
+
 export default defineConfig({
     plugins: [plugin()],
     resolve: {

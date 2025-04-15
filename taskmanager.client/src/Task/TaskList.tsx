@@ -1,7 +1,3 @@
-// отредактированная версия TaskList с улучшенным стилем
-// вся логика и структура сохранены, только улучшен внешний вид
-
-// импорт библиотек и компонентов
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import './TaskList.css';
@@ -14,8 +10,6 @@ import API_BASE_URL from '../config';
 import viewIcon from '../Icons/view.png';
 import editIcon from '../Icons/Edit.png';
 import deleteIcon from '../Icons/Delete.png';
-
-
 
 interface TaskItem {
     id: string;

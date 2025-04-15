@@ -51,7 +51,6 @@ builder.Services.AddScoped<NotificationServices>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<KafkaProducer>();
-builder.Services.AddScoped<KafkaConsumer>();
 builder.Services.AddSingleton<KafkaProducerService>();
 builder.Services.AddHostedService<KafkaNotificationConsumer>();
 

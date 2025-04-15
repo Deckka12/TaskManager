@@ -54,7 +54,6 @@ public class KafkaNotificationConsumer : BackgroundService
                         service.SaveNotificationAsync(new Guid(message.UserId), message.Message).Wait();
                         service1.Clients.Client(connId).SendAsync("ReceiveNotification", message.Message);
                     }
-                         // или `.GetAwaiter().GetResult();`
                 }
                 catch (OperationCanceledException)
                 {

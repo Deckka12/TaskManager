@@ -22,11 +22,11 @@ public class KafkaProducerService
         try
         {
             var result = await _producer.ProduceAsync(_topic, new Message<Null, string> { Value = message });
-            Console.WriteLine($"✅ Kafka message sent to {result.TopicPartitionOffset}");
+            Console.WriteLine($"Kafka message sent to {result.TopicPartitionOffset}");
         }
         catch (ProduceException<Null, string> ex)
         {
-            Console.WriteLine($"❌ Kafka produce error: {ex.Error.Reason}");
+            Console.WriteLine($"Kafka produce error: {ex.Error.Reason}");
         }
     }
 }
