@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import API_BASE_URL from "../config";
 import MarkdownCommentEditor from "../MarkdownCommentEditor";
 import "./TaskList.css"; // убедись, что стили подключены
+import { toast } from "react-toastify";
 
 interface User {
     id: string;
@@ -71,8 +72,19 @@ const CreateTask: React.FC<CreateTaskProps> = ({ onClose, getTask }) => {
         if (!projectId) newErrors.projectId = "Проект обязателен";
         if (!categoryId) newErrors.categoryId = "Категория обязательна";
 
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length > 0) return;
+
+        if (Object.keys(newErrors).length > 0) {
+            const combinedMessage = (
+                <div style={{ textAlign: 'left' }}>
+                    {Object.values(newErrors).map((msg, idx) => (
+                        <div key={idx}>• {msg}</div>
+                    ))}
+                </div>
+            );
+            toast.error(combinedMessage);
+            setErrors(newErrors);
+            return;
+        }
 
         if (!auth?.user?.id) return;
 

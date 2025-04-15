@@ -10,6 +10,7 @@ using TaskManager.Application.Services;
 using TaskManager.Domain.Interface;
 using TaskManager.Infrastructure.DBContext;
 using TaskManager.Infrastructure.Repositories;
+using TaskManager.Server.broker;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,7 +54,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<KafkaProducer>();
 builder.Services.AddSingleton<KafkaProducerService>();
 builder.Services.AddHostedService<KafkaNotificationConsumer>();
-
+builder.Services.AddHostedService<DueDateTask>();
 
 
 // 4. SignalR
@@ -102,7 +103,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000") // ← строго HTTP, как у тебя на фронте
+            .WithOrigins("https://localhost:3000") // ← строго HTTP, как у тебя на фронте
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

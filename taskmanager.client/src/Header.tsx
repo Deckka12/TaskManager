@@ -5,9 +5,8 @@ import { AuthContext } from "./context/AuthContext";
 import { Bell, UserCircle } from "lucide-react";
 import "./Header.css";
 import API_BASE_URL from "./config";
-import LoginModal from "./Login/Login"; // путь к файлу
+import LoginModal from "./Login/Login";
 import RegisterModal from "./Login/Register";
-
 
 interface Notification {
     id: string;
@@ -24,7 +23,6 @@ const Header: React.FC = () => {
     const [unreadCount, setUnreadCount] = useState<number>(0);
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [registerModalOpen, setRegisterModalOpen] = useState(false);
-
 
     const profileMenuRef = useRef<HTMLDivElement>(null);
     const notificationMenuRef = useRef<HTMLDivElement>(null);
@@ -104,7 +102,7 @@ const Header: React.FC = () => {
                             title="Уведомления"
                             onClick={() => setNotifOpen(!notifOpen)}
                         >
-                            <Bell size={20} />
+                            <Bell size={22} />
                             {unreadCount > 0 && (
                                 <span className="notification-badge">{unreadCount}</span>
                             )}
@@ -137,40 +135,30 @@ const Header: React.FC = () => {
                             <UserCircle size={24} />
                         </div>
                         {menuOpen && (
-                            <div className="profile-dropdown" style={{ zIndex: 999 }}>
+                            <div className="profile-dropdown">
                                 <span className="user-name">Привет, {auth.user.name}!</span>
                                 <Link to="/profile">Профиль</Link>
                                 <Link to="/settings">Настройки</Link>
-
                                 {auth.user.roles.includes("admin") && (
                                     <Link to="/admin">Админ-панель</Link>
                                 )}
-
-                                <button
-                                    className="logout-button"
-                                    onClick={() => {
-                                        console.log("⛔ Нажата кнопка выхода");
-                                        auth.logout();
-                                    }}
-                                >
+                                <button className="logout-button" onClick={() => auth.logout()}>
                                     Выйти
                                 </button>
                             </div>
                         )}
                     </div>
                 ) : (
-                        <div className="auth-links">
-                            <button className="nav-link" onClick={() => setLoginModalOpen(true)}>Войти</button>
-                            <button className="nav-link" onClick={() => setRegisterModalOpen(true)}>Регистрация</button>
-                        </div>
+                    <div className="auth-links">
+                        <button className="nav-link" onClick={() => setLoginModalOpen(true)}>Войти</button>
+                        <button className="nav-link" onClick={() => setRegisterModalOpen(true)}>Регистрация</button>
+                    </div>
                 )}
             </div>
+
             {loginModalOpen && <LoginModal onClose={() => setLoginModalOpen(false)} />}
             {registerModalOpen && <RegisterModal onClose={() => setRegisterModalOpen(false)} />}
-
-
         </header>
-
     );
 };
 

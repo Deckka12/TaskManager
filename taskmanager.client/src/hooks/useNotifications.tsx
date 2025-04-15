@@ -33,3 +33,4 @@ export const useNotifications = () => {
         };
     }, [auth?.user?.id]);
 };
+ 

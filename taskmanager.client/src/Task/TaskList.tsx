@@ -10,6 +10,7 @@ import API_BASE_URL from '../config';
 import viewIcon from '../Icons/view.png';
 import editIcon from '../Icons/Edit.png';
 import deleteIcon from '../Icons/Delete.png';
+import { toast } from "react-toastify";
 
 interface TaskItem {
     id: string;
@@ -109,12 +110,12 @@ const TaskList: React.FC = () => {
             await axios.post(`${API_BASE_URL}/api/task/delete`, { id: taskId }, {
                 headers: { Authorization: `Bearer ${auth?.token}` }
             });
-            alert("Задача удалена");
+            toast("Задача удалена");
             closeTaskDetailss();
             gettasks();
         } catch (error) {
             console.error("Ошибка при удалении задачи:", error);
-            alert("Не удалось удалить задачу.");
+            toast("Не удалось удалить задачу.");
         }
     };
 

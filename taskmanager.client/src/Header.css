@@ -1,17 +1,24 @@
-.header {
+п»ї.header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 1.5rem;
-    background-color: #f5f7fa;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    background-color: #f9fbfd;
     border-bottom: 1px solid #e0e0e0;
+    flex-wrap: nowrap;
 }
 
-.header-left .logo {
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
     font-size: 1.5rem;
     font-weight: bold;
     color: #333;
     text-decoration: none;
+    margin-right: 2rem;
 }
 
 .nav {
@@ -21,106 +28,30 @@
 
 .nav-link {
     color: #333;
-    background-color: #f5f7fa;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s;
-    padding: 5px;
 }
 
     .nav-link:hover {
-
+        color: #007bff;
     }
 
 .header-right {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
+}
+
+.notification-container,
+.profile-menu {
+    position: relative;
 }
 
 .icon-button {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0.25rem;
-}
-
-
-.profile-menu {
-    position: relative;
-    cursor: pointer;
-}
-
-.profile-dropdown {
-    position: absolute;
-    right: 0;
-    top: 120%;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-.profile-icon {
-    cursor: pointer;
-}
-
-
-.profile-dropdown a {
-    display: block;
-    padding: 0.25rem 0.5rem;
-    text-decoration: none;
-    color: #333;
-    font-size: 0.9rem;
-}
-
-    .profile-dropdown a:hover {
-        background-color: #f0f0f0;
-    }
-
-.notifications-dropdown {
-    position: absolute;
-    top: 40px;
-    right: 60px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    width: 20%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    max-height: 80%;
-    overflow: auto;
-    padding: 20px;
-}
-
-.notification-item {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-
-}
-
-    .notification-item.unread {
-        background-color: #f0f8ff;
-        font-weight: bold;
-    }
-
-    .notification-item:last-child {
-        border-bottom: none;
-    }
-
-.empty {
-    text-align: center;
-    color: #888;
-    font-style: italic;
-}
-
-.notification-btn {
     position: relative;
 }
 
@@ -130,26 +61,107 @@
     right: -6px;
     background-color: red;
     color: white;
-    border-radius: 50%;
     font-size: 11px;
+    font-weight: bold;
     width: 16px;
     height: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-}
-.profile-dropdown {
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    z-index: 9999; /* важно */
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #fff;
 }
 
-.logout-button {
+.notifications-dropdown,
+.profile-dropdown {
+    position: absolute;
+    right: 0;
+    top: 130%;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 240px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.notification-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
     cursor: pointer;
 }
 
+    .notification-item.unread {
+        background-color: #f0f8ff;
+        font-weight: bold;
+    }
+.notifications-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    width: 320px;
+    max-width: 90vw;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.empty {
+    color: #999;
+    text-align: center;
+    font-style: italic;
+}
+
+.profile-dropdown a,
+.logout-button {
+    display: block;
+    padding: 6px 10px;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+    border: none;
+    background: none;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+}
+
+    .logout-button:hover,
+    .profile-dropdown a:hover {
+        background-color: #f5f5f5;
+    }
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .nav {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .header-right {
+        align-self: flex-end;
+    }
+
+    .notifications-dropdown,
+    .profile-dropdown {
+        top: 100%;
+        right: 0;
+        width: 80vw;
+        border-radius: 0;
+        max-height: 400px;
+    }
+}

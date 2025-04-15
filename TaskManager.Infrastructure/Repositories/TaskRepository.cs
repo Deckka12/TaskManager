@@ -45,6 +45,7 @@ namespace TaskManager.Infrastructure.Repositories
             return await _context.Tasks
                .Include(t => t.Project)
                .Include(x => x.User)
+               .Include(x => x.Performer)
                .Include(x=> x.WorkLogs)
                 .ThenInclude(w => w.WorkType)
                .Include(x => x.WorkLogs)

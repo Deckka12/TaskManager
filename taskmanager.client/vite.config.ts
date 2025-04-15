@@ -1,27 +1,24 @@
-import { fileURLToPath, URL } from 'node:url';
+﻿import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import plugin from '@vitejs/plugin-react';
-import fs from 'fs';
-import path from 'path';
-import child_process from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as child_process from 'child_process';
 import { env } from 'process';
 import type { ServerOptions } from 'vite';
 
 const isDocker = process.env.DOCKER === 'true';
 
+const baseFolder =
+    env.APPDATA !== undefined && env.APPDATA !== ''
+        ? `${env.APPDATA}/ASP.NET/https`
+        : `${env.HOME}/.aspnet/https`;
+
 const certificateName = 'taskmanager.client';
-let certFilePath = '';
-let keyFilePath = '';
+const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
 if (!isDocker) {
-    const baseFolder =
-        env.APPDATA !== undefined && env.APPDATA !== ''
-            ? `${env.APPDATA}/ASP.NET/https`
-            : `${env.HOME}/.aspnet/https`;
-
-    certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-    keyFilePath = path.join(baseFolder, `${certificateName}.key`);
-
     if (!fs.existsSync(baseFolder)) {
         fs.mkdirSync(baseFolder, { recursive: true });
     }
@@ -55,22 +52,24 @@ const target =
             ? env.ASPNETCORE_URLS.split(';')[0]
             : 'https://localhost:7121';
 
+
 const serverOptions: ServerOptions = {
     host: true,
     port: 3000,
     proxy: {
-        '^/api': {
+        '^/weatherforecast': {
             target,
-            changeOrigin: true,
             secure: false
         }
     },
-    ...(isDocker ? {} : {
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath)
-        }
-    })
+    ...(isDocker
+        ? {} 
+        : {
+            https: {
+                key: fs.readFileSync(keyFilePath),
+                cert: fs.readFileSync(certFilePath)
+            }
+        })
 };
 
 export default defineConfig({

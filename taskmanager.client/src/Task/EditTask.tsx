@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { updateTask } from "../services/taskService";
 import API_BASE_URL from "../config";
-
+import { toast } from "react-toastify";
 interface TaskItem {
     id: string;
     title: string;
@@ -75,7 +75,7 @@ const EditTask: React.FC<EditTaskProps> = ({ task, onClose, onTaskUpdated }) => 
             .then(response => setUsers(response.data))
             .catch(error => console.error("Ошибка загрузки пользователей:", error));
 
-        axios.get<Project[]>(`${API_BASE_URL}/api/task/project`)
+        axios.get<Project[]>(`${API_BASE_URL}/api/project/project`)
             .then(response => setProjects(response.data))
             .catch(error => console.error("Ошибка загрузки проектов:", error));
 
@@ -105,10 +105,8 @@ const EditTask: React.FC<EditTaskProps> = ({ task, onClose, onTaskUpdated }) => 
         await updateTask(task.id, updatedTask);
         onTaskUpdated();
         onClose();
+        toast("Задача обновлена " + updatedTask.title);
     };
-
-
-
 
     return (
         <div className="modal-overlay">
